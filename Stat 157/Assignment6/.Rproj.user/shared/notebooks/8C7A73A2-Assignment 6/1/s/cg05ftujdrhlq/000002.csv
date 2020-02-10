@@ -1,0 +1,4 @@
+"0","card <- read.csv(""card.csv"")"
+"0","Y <- card$lwage"
+"0","Z <- card$nearc2"
+"0","D <- ifelse(card$educ > 12, 1, 0)"

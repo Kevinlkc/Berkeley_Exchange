@@ -1,0 +1,7 @@
+"0","# Interval estimation
+print(paste(""["",obsValue[1] - SRE_adjusted*1.96,"","",obsValue[1] + SRE_adjusted*1.96,""]""), sep = """")
+"
+"1","[1]"
+"1"," ""[ -0.0595410962445224 , 0.0365214636256135 ]"""
+"1","
+"

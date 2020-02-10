@@ -1,0 +1,243 @@
+\documentclass[11pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,head=.1in,nofoot]{geometry}
+
+\setlength{\footskip}{24pt} % Page number/footer spacing
+\usepackage{setspace,url,bm,amsmath} % For double-spacing, URL font, math symbols
+
+\usepackage{titlesec} % Section header formatting
+\titlelabel{\thetitle.\quad} % Section header formatting
+%\titleformat*{\section}{\bf\large\center\uppercase} % Section header formatting
+
+\usepackage{graphicx} % Graphics scaling
+\usepackage{bbm, amssymb}
+\usepackage{latexsym}
+\usepackage{caption}
+\usepackage[margin=20pt]{subcaption}
+\usepackage{hyperref, enumerate}
+\usepackage[all,import]{xy}
+
+
+
+
+\usepackage[table]{xcolor}
+%\newcommand\x{\times}
+%\newcommand\y{\cellcolor{green!10}}
+\newcommand\y[1]{%
+  \colorbox{green!10}{$#1$}%
+}
+\newcommand{\GG}[1]{}
+
+\usepackage{amsthm}
+%\usepackage{undertilde}
+\usepackage{comment}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
+\newtheorem{excont}{Example}
+\renewcommand{\theexcont}{\theexample}
+
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+
+
+
+
+\usepackage{natbib} % ASA citation style
+\bibpunct{(}{)}{;}{a}{}{,} % ASA citation style
+
+\renewcommand{\refname}{REFERENCES} % Capitalize bibliography section header
+\usepackage{etoolbox} % Bibliography underfull/overfull box fix
+\apptocmd{\sloppy}{\hbadness 10000\relax}{}{} % Bibliography underfull/overfull box fix
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\DeclareMathOperator*{\Med}{Med}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\letas{\mathrel{\mathop{=}\limits^{\triangle}}}
+\def\ind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \end{picture}
+        }
+\def\nind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \put(1,0){{\it /}}
+         \end{picture}
+    }
+
+\def\AVar{\text{AsyVar}}
+\def\Var{\text{var}}
+\def\var{\text{var}}
+\def\Cov{\text{cov}}
+\def\cov{\text{cov}}
+\def\sumn{\sum_{i=1}^n}
+\def\summ{\sum_{j=1}^m}
+\def\convergeas{\stackrel{a.s.}{\longrightarrow}}
+\def\converged{\stackrel{d}{\longrightarrow}}
+\def\convergep{\stackrel{p}{\longrightarrow}}
+\def\iidsim{\stackrel{i.i.d.}{\sim}}
+\def\indsim{\stackrel{ind}{\sim}}
+\def\N{\mathcal{N}}
+\def\d{\textup{d}}
+\def\KL{\textsc{KL}}
+\def\obs{\textnormal{obs}}
+\newcommand{\pr}{\textnormal{pr}}
+\def\FRT{\text{Fisher randomization test}}
+\def\asim{\stackrel{\cdot}{\sim}}
+\def\DCE{\textsc{DCE}}
+
+\begin{document}
+\doublespacing
+\title{\bf  Problem Set 1\\
+Due September 23rd, 6:30 pm before class
+}
+\date{}
+\maketitle
+
+
+
+
+
+\section{Specification searches}
+
+This is a reanalysis of the LaLonde observational data used by \citet{hainmueller2012entropy}. In \texttt{lalonderegression.R}, I run two linear regressions, one without covariates and the other with all covariates. The coefficients of the treatment have different signs.
+
+In total, there are 10 covariates and therefore $2^{10} = 1024$ possible subsets of covariates. Run $1024$ linear regressions with subsets of covariates, and report the regression coefficients of the treatment. How many are positively significant, how many are negatively significant, and how many are not significant? You can also report other interesting findings from these regressions.
+
+
+
+
+\section{More on racial discrimination}
+
+This is a reanalysis of the data based on the study of \citet{bertrand2004emily}. In class, I conduct an analysis based on the whole dataset, as shown in \texttt{resume.R}.
+
+Conduct the same analysis for males and females. That is, conduct two subgroup analyses. What do you find?
+
+
+
+
+
+\section{Regression adjustment in the Fisher Randomization Test}
+
+This is a reanalysis of the LaLonde experimental data used in the lecture. In \texttt{FRTlalonde.R}, I conduct the Fisher randomization test using four test statistics. The Fisher randomization test can be more general with at least the following two additional strategies. Under the potential outcomes framework, {\it all potential outcomes and covariates are fixed numbers}. 
+
+
+First, we can use test statistics based on residuals from the linear regression. Run a linear regression of the outcomes on the covariates, and obtain the residuals (i.e., treat the residuals as the pseudo ``outcomes''). Then define the four test statistics based on the residuals. Conduct the Fisher randomization test using these four new test statistics. Report the corresponding $p$-values.
+
+
+Second, we can define the test statistic as the coefficient in the linear regression of the outcomes on the treatment and covariates. Conduct the Fisher randomization test using this test statistic. Report the corresponding $p$-value. 
+
+
+Why the five $p$-values from the above two strategies are exact $p$-values? Justify them. 
+
+
+
+\section{Correlation and partial correlation}
+
+Consider a three-dimensional Normal random vector:
+$$
+\begin{pmatrix}
+X\\
+Y\\
+Z
+\end{pmatrix}
+\sim 
+\mathcal{N}
+\left(
+\begin{pmatrix}
+0\\
+0\\
+0
+\end{pmatrix},
+\begin{pmatrix}
+1 & \rho_{XY} &\rho_{XZ} \\
+  \rho_{XY}  & 1 & \rho_{YZ} \\
+  \rho_{XZ} &  \rho_{YZ} & 1
+\end{pmatrix}
+\right) . 
+$$
+The correlation coefficient between $X$ and $Y$ is $\rho_{XY}$. The partial correlation coefficient between $X$ and $Y$ given $Z$ is their correlation coefficient in the conditional distribution $(X,Y)\mid Z$, denoted by $\rho_{XY|Z}$.
+
+Express $\rho_{XY|Z}$ using $(\rho_{XY}, \rho_{XZ}, \rho_{YZ}) $. Then give an example with $\rho_{XY} > 0$ and $\rho_{XY|Z} < 0$.
+
+
+
+
+
+
+\section{Nonlinear causal estimands}
+
+With potential outcomes $\{  (Y_i(1), Y_i(0) \}_{i=1}^n$ for $n$ units under the treatment and control, we can define median treatment effect as
+$$
+\delta_1 = \text{median}\{  (Y_i(1) \}_{i=1}^n - \text{median}\{  (Y_i(0) \}_{i=1}^n,
+$$
+which is, in general, different from the median of the individual treatment effect
+$$
+\delta_2 = \text{median}\{  (Y_i(1) - Y_i(0) \}_{i=1}^n .
+$$
+
+
+Given numerical examples which have $\delta_1 = \delta_2$, $\delta_1 > \delta_2$, and $\delta_1 < \delta_2.$
+
+Which estimand makes more sense, $\delta_1$ or $\delta_2$? Why? Use examples to justify your conclusion. 
+
+
+
+\section{A better bound of the variance formula}
+
+In class, I showed
+$$
+\var(\widehat{\tau}) = \frac{S_1^2}{n_1} + \frac{S_0^2}{n_0} - \frac{S_\tau^2}{n} \leq \frac{S_1^2}{n_1} + \frac{S_0^2}{n_0}.
+$$
+
+Show the following bound
+$$
+\var(\widehat{\tau})  \leq   \frac{1}{n} \left(  \sqrt{  \frac{n_0}{n_1}  } S_1 +  \sqrt{  \frac{n_1}{n_0}  } S_0   \right)^2.
+$$
+When will the equality hold? 
+
+ 
+
+
+\section{Vector version of \citet{Neyman:1923} -- only for Stat 260 students}
+
+The classic result of \citet{Neyman:1923} is about a scalar outcome. It is common to have multiple outcomes in practice. Therefore, we can extend the potential outcomes to vectors. 
+We consider the average causal effect on a vector outcome $\bm{V}  \in \mathbb{R}^K$, 
+$$
+\tau_{\bm{V}} = \frac{1}{n}  \sumn \left\{  \bm{V}_i(1) - \bm{V}_i(0) \right\},
+$$
+where $\bm{V}_i(1)$ and $\bm{V}_i(0)$ are the potential outcomes of $\bm{V}$ for unit $i$. 
+The Neyman-type estimator for $\tau_{\bm{V}}$ is the difference between the sample mean vectors of the observed outcomes under treatment and control:
+$$
+\widehat{ \tau}_{\bm{V}} = \bar{\bm{V}}_1  - \bar{\bm{V}}_0 
+= \frac{1}{n_1}   \sumn Z_i  \bm{V}_i   - \frac{1}{n_0}  \sumn (1-Z_i) \bm{V}_i . 
+$$
+
+
+Consider a completely randomized experiment.
+Show that $\widehat{ \tau}_{\bm{V}} $ is unbiased for $\tau_{\bm{V}} $. Find the covariance matrix of $\widehat{ \tau}_{\bm{V}} $. Find a (possibly conservative) estimator for the variance. 
+ 
+
+\bibliographystyle{apalike}
+\bibliography{causal}
+
+\end{document}
+
+
+

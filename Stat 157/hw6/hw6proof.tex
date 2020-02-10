@@ -1,0 +1,188 @@
+\documentclass[11pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,head=.1in,nofoot]{geometry}
+
+\setlength{\footskip}{24pt} % Page number/footer spacing
+\usepackage{setspace,url,bm,amsmath} % For double-spacing, URL font, math symbols
+
+\usepackage{titlesec} % Section header formatting
+\titlelabel{\thetitle.\quad} % Section header formatting
+%\titleformat*{\section}{\bf\large\center\uppercase} % Section header formatting
+
+\usepackage{graphicx} % Graphics scaling
+\usepackage{bbm, amssymb}
+\usepackage{latexsym}
+\usepackage{caption}
+\usepackage[margin=20pt]{subcaption}
+\usepackage{hyperref, enumerate}
+\usepackage[all,import]{xy}
+
+\usepackage{hyperref}
+
+
+\usepackage[table]{xcolor}
+%\newcommand\x{\times}
+%\newcommand\y{\cellcolor{green!10}}
+\newcommand\y[1]{%
+  \colorbox{green!10}{$#1$}%
+}
+\newcommand{\GG}[1]{}
+
+\usepackage{amsthm}
+%\usepackage{undertilde}
+\usepackage{comment}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
+\newtheorem{excont}{Example}
+\renewcommand{\theexcont}{\theexample}
+
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+
+
+
+
+\usepackage{natbib} % ASA citation style
+\bibpunct{(}{)}{;}{a}{}{,} % ASA citation style
+
+\renewcommand{\refname}{REFERENCES} % Capitalize bibliography section header
+\usepackage{etoolbox} % Bibliography underfull/overfull box fix
+\apptocmd{\sloppy}{\hbadness 10000\relax}{}{} % Bibliography underfull/overfull box fix
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\DeclareMathOperator*{\Med}{Med}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\letas{\mathrel{\mathop{=}\limits^{\triangle}}}
+\def\ind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \end{picture}
+        }
+\def\nind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \put(1,0){{\it /}}
+         \end{picture}
+    }
+
+\def\AVar{\text{AsyVar}}
+\def\Var{\text{var}}
+\def\var{\text{var}}
+\def\Cov{\text{cov}}
+\def\cov{\text{cov}}
+\def\sumn{\sum_{i=1}^n}
+\def\summ{\sum_{j=1}^m}
+\def\convergeas{\stackrel{a.s.}{\longrightarrow}}
+\def\converged{\stackrel{d}{\longrightarrow}}
+\def\convergep{\stackrel{p}{\longrightarrow}}
+\def\iidsim{\stackrel{i.i.d.}{\sim}}
+\def\indsim{\stackrel{ind}{\sim}}
+\def\N{\mathcal{N}}
+\def\d{\textup{d}}
+\def\KL{\textsc{KL}}
+\def\obs{\textnormal{obs}}
+\newcommand{\pr}{\textnormal{pr}}
+\def\FRT{\text{Fisher randomization test}}
+\def\asim{\stackrel{\cdot}{\sim}}
+\def\DCE{\textsc{DCE}}
+
+\begin{document}
+\doublespacing
+
+
+\section{Numerical equivalence of the indirect least squares and two-stage least squares estimators}
+
+
+Consider the following canonical regression with one endogenous regressor $D$ and one instrumental variable $Z$:
+\begin{eqnarray*}
+Y &=& \tau D + X \beta + \varepsilon_1,\\
+D &=& \alpha  Z + X\gamma  +  \varepsilon_2,
+\end{eqnarray*}
+where $Y, D, Z, \varepsilon_1, \varepsilon_2$ are $n\times 1$ vectors, and $X$ is an $n\times p$ matrix. If $D$ is endogenous, then the OLS fit for the first equation gives a biased estimator for $\tau$. Instead, we can use either the indirect least squares or the two-stage least squares estimator. 
+
+The indirect least squares estimator has three steps: first, fit the OLS of $Y$ on $Z$ and $X$ and get the coefficient of $Z$, denoted by $\hat{\theta}$; second, fit the OLS of $D$ on $Z$ and $X$ and get the coefficient of $Z$, denoted by $\hat{\alpha}$; third, the indirect least squares estimator is the ratio $ \hat{\tau}_{\text{ils}} =  \hat{\theta} / \hat{\alpha}.$ 
+
+
+
+The two-stage least squares estimator has two steps: first, fit the OLS of $D$ on $Z$ and $X$ and obtain the fitted vector $\hat{D}$; second, fit the OLS of $Y$ on $\hat{D}$ and $X$ and obtain the coefficient of $\hat{D}$, denoted by $\hat{\tau}_{\text{tsls}}$. 
+
+Many textbooks claim that $ \hat{\tau}_{\text{ils}}  = \hat{\tau}_{\text{tsls}}$ without a formal proof. Note that this is a linear algebra fact without assuming any modeling assumptions. We can verify this using the following simple numerical example. 
+
+
+\begin{verbatim}
+> n = 10^5
+> u = rnorm(n)
+> v = rnorm(n)
+> x = matrix(rnorm(n*2), n, 2)
+> z = rnorm(n)
+> d = z + as.vector(x%*%c(1, 2)) + u
+> y = d + as.vector(x%*%c(1, -1)) + u + v
+> summary(lm(y ~ d + x))$coef[2]
+[1] 1.500528
+> summary(lm(y ~ z + x))$coef[2]/summary(lm(d ~ z + x))$coef[2]
+[1] 1.001864
+> dhat = lm(d ~ z + x)$fitted.values
+> summary(lm(y ~ dhat + x))$coef[2]
+[1] 1.001864
+\end{verbatim}
+
+
+Now prove that $ \hat{\tau}_{\text{ils}}  = \hat{\tau}_{\text{tsls}}$. 
+
+
+
+Proof. Define $H_X = X(X'X)^{-1}X'$ as the hat matrix of $X$. We will use the following basic properties of the projection matrix $I-H_X$: $(I-H_X)X=0$, $(I-H_X)' = (I-H_X)$ and $(I-H_X)^2= (I-H_X)$.
+
+First, we have
+\begin{eqnarray*}
+\hat{\theta} &=&  \text{coefficient of } Z \text{ in the OLS fit of } Y \text{ on } Z \text{ and } X \\
+&\stackrel{FWL}{=} & \text{coefficient of } (I-H_X)Z \text{ in the OLS fit of } (I-H_X)Y \text{ on } (I-H_X)Z \\
+&=& \frac{  Z' (I-H_X) Y }{  Z' (I-H_X) Z },
+\end{eqnarray*}
+and
+\begin{eqnarray*}
+\hat{\alpha} &=&  \text{coefficient of } Z \text{ in the OLS fit of } D \text{ on } Z \text{ and } X \\
+&\stackrel{FWL}{=} & \text{coefficient of } (I-H_X)Z \text{ in the OLS fit of } (I-H_X)D \text{ on } (I-H_X)Z \\
+&=& \frac{  Z' (I-H_X) D }{  Z' (I-H_X) Z }.
+\end{eqnarray*}
+The indirect least squares estimator is then
+$$
+ \hat{\tau}_{\text{ils}}  =  \frac{  \hat{\theta} }{  \hat{\alpha}  } 
+=  \frac{     Z' (I-H_X) Y      }{     Z' (I-H_X) D  } .
+$$
+
+
+The two-stage least squares estimator is 
+\begin{eqnarray*}
+\hat{\tau}_{\text{ils}}  &=&  \text{coefficient of } \hat{D} \text{ in the OLS fit of } Y \text{ on } \hat{D}  \text{ and } X \\
+&\stackrel{FWL}{=} & \text{coefficient of }  (I-H_X)\hat{D} \text{ in the OLS fit of }  (I-H_X)Y \text{ on }  (I-H_X) \hat{D}   \\
+&=& \frac{     \hat{D}' (I-H_X) Y      }{     \hat{D}' (I-H_X) \hat{D}  } .
+\end{eqnarray*}
+The fitted vector $\hat{D}$ can be written as $\hat{D} =  \hat{\alpha}  Z + X \hat{\gamma}$ from the OLS of $D$ on $Z$ and $X$. Therefore, we can further write the two-stage least squares estimator as
+\begin{eqnarray*}
+\hat{\tau}_{\text{ils}}  &=& \frac{    ( \hat{\alpha}  Z + X \hat{\gamma})' (I-H_X) Y      }{    ( \hat{\alpha}  Z + X \hat{\gamma})' (I-H_X) ( \hat{\alpha}  Z + X \hat{\gamma}) } \\
+&=& \frac{    \hat{\alpha}  Z  ' (I-H_X) Y      }{     \hat{\alpha}^2  Z ' (I-H_X) Z } \\
+&=& \frac{   Z  ' (I-H_X) Y      }{     \hat{\alpha} Z ' (I-H_X) Z } ,
+\end{eqnarray*}
+which equals the indirect least squares because $ \hat{\alpha}  = Z' (I-H_X) D /  Z' (I-H_X) Z $ as I show above. 
+
+\end{document}
+
+
+

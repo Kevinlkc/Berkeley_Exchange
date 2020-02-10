@@ -1,0 +1,248 @@
+\documentclass[11pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,head=.1in,nofoot]{geometry}
+
+\setlength{\footskip}{24pt} % Page number/footer spacing
+\usepackage{setspace,url,bm,amsmath} % For double-spacing, URL font, math symbols
+
+\usepackage{titlesec} % Section header formatting
+\titlelabel{\thetitle.\quad} % Section header formatting
+%\titleformat*{\section}{\bf\large\center\uppercase} % Section header formatting
+
+\usepackage{graphicx} % Graphics scaling
+\usepackage{bbm, amssymb}
+\usepackage{latexsym}
+\usepackage{caption}
+\usepackage[margin=20pt]{subcaption}
+\usepackage{hyperref, enumerate}
+\usepackage[all,import]{xy}
+
+
+
+
+\usepackage[table]{xcolor}
+%\newcommand\x{\times}
+%\newcommand\y{\cellcolor{green!10}}
+\newcommand\y[1]{%
+  \colorbox{green!10}{$#1$}%
+}
+\newcommand{\GG}[1]{}
+
+\usepackage{amsthm}
+%\usepackage{undertilde}
+\usepackage{comment}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
+\newtheorem{excont}{Example}
+\renewcommand{\theexcont}{\theexample}
+
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+
+
+
+
+\usepackage{natbib} % ASA citation style
+\bibpunct{(}{)}{;}{a}{}{,} % ASA citation style
+
+\renewcommand{\refname}{REFERENCES} % Capitalize bibliography section header
+\usepackage{etoolbox} % Bibliography underfull/overfull box fix
+\apptocmd{\sloppy}{\hbadness 10000\relax}{}{} % Bibliography underfull/overfull box fix
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\DeclareMathOperator*{\Med}{Med}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\letas{\mathrel{\mathop{=}\limits^{\triangle}}}
+\def\ind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \end{picture}
+        }
+\def\nind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \put(1,0){{\it /}}
+         \end{picture}
+    }
+
+\def\AVar{\text{AsyVar}}
+\def\Var{\text{var}}
+\def\var{\text{var}}
+\def\Cov{\text{cov}}
+\def\cov{\text{cov}}
+\def\sumn{\sum_{i=1}^n}
+\def\summ{\sum_{j=1}^m}
+\def\convergeas{\stackrel{a.s.}{\longrightarrow}}
+\def\converged{\stackrel{d}{\longrightarrow}}
+\def\convergep{\stackrel{p}{\longrightarrow}}
+\def\iidsim{\stackrel{i.i.d.}{\sim}}
+\def\indsim{\stackrel{ind}{\sim}}
+\def\N{\mathcal{N}}
+\def\d{\textup{d}}
+\def\KL{\textsc{KL}}
+\def\obs{\textnormal{obs}}
+\newcommand{\pr}{\textnormal{pr}}
+\def\FRT{\text{Fisher randomization test}}
+\def\asim{\stackrel{\cdot}{\sim}}
+\def\DCE{\textsc{DCE}}
+\newcommand*{\tran }{^{\mkern-1.5mu\mathsf{T}}}
+
+
+\begin{document}
+\doublespacing
+\title{\bf  Problem Set 3\\
+Due October 18th, 11pm\\
+Note that October 21st will be our in-class mid-term.
+}
+\date{}
+\maketitle
+
+
+\section{A predictive estimator and Lin's estimator}
+
+Consider a completely randomized experiment. Let $Z_i$, $x_i$ and $Y_i$ be the binary treatment, centered covariates, and outcome for unit $i$, $i=1,\ldots, n.$ We can use Lin's estimator $\hat{\tau}_\textsc{L}$ to estimate the average treatment effect.
+
+We also discussed a strategy to impute all missing potential outcomes. From the treatment group, we can use the OLS to fit a linear predictor for the potential outcome under treatment: $\hat{\mu}_1(x_i) = \hat{\gamma}_1 + \hat{\beta}_1\tran  x_i$. From the control group, we can use the OLS to fit a linear predictor for the potential outcome under control: $\hat{\mu}_0(x_i) = \hat{\gamma}_0 + \hat{\beta}_0\tran  x_i$. Then we can use these predictors to impute the missing potential outcome, leading to a predictive estimator
+$$
+\hat{\tau}_{\text{pre}} = \frac{1}{n}
+\left\{
+\sum_{Z_i=1} Y_i + \sum_{Z_i=0} \hat{\mu}_1(x_i)- \sum_{Z_i=1} \hat{\mu}_0(x_i) - \sum_{Z_i=0} Y_i
+\right\} .
+$$
+
+In class, I claimed that
+$$
+\hat{\tau}_\textsc{L} = \hat{\tau}_{\text{pre}}  = \hat{\gamma}_1 - \hat{\gamma}_0
+= \left\{  \hat{\bar{Y}}(1) - \hat{\beta}_1\tran  \hat{\bar{x}}(1) \right\}  
+-  \left\{  \hat{\bar{Y}}(0) - \hat{\beta}_0\tran  \hat{\bar{x}}(0) \right\} . 
+$$
+Show the above identities using the properties of the OLS. 
+
+
+\section{Data re-analyses}
+
+Re-analyze three datasets from matched-pair designs. 
+
+\begin{enumerate}
+[(1)]
+\item
+In \texttt{FRTDarwinMP.R}, I analyze Darwin's data using the FRT based on the test statistic $\hat{\tau}$.
+
+Re-analyze this dataset using the FRT with the Wilcoxon signed rank sum statistic.
+
+Re-analyze this dataset based on the Neymanian inference: unbiased point estimator, conservative variance estimator, 95\% confidence interval.
+
+
+\item
+In \texttt{NeymanMPstar.R}, I analyze the data from based on Neymanian inference.
+
+Re-analyze this dataset using the FRT with different test statistics. 
+
+Re-analyze this dataset using the FRT with covariate adjustment, e.g., you can define test statistics based on residuals from the OLS fit of the observed outcome on covariates. Will the conclusion change if you do not include an intercept in your OLS fit?
+
+\item 
+Use the data from \citet{angrist_highschool}. The original analysis is quite complicated. We focus only on Table A1 viewing the schools as experimental units. Then we have a matched-pair design on the schools. For simplicity, we drop pair 6 and all the pairs with noncompliance. This results in 14 complete pairs. The outcome is the Bagrut passing rates in 2001 and 2002, with the Bagrut passing rates in 1999 and 2000 as pretreatment covariates. 
+
+Re-analyze the data using the FRT with and without covariate adjustment.
+
+Re-analyze the data based on the Neymanian inference with and without covariates. 
+ 
+
+\end{enumerate}
+
+
+
+
+\section{Covariance estimator in matched-pair designs}
+In a matched-pair design, we define the within-pair differences of outcome and covariate as
+$$
+\hat{\tau}_i= (2Z_i-1) (Y_{i1} - Y_{i2}),\quad
+\hat{\tau}_{xi} = (2Z_i-1) (x_{i1} - x_{i2}),
+$$
+and the averages of them as
+$$
+\hat{\tau} = \frac{1}{n} \sum_{i=1}^n \hat{\tau}_i,\quad
+\hat{\tau}_{x}  = \frac{1}{n} \sum_{i=1}^n \hat{\tau}_{xi}.
+$$
+
+Show that an unbiased estimator of cov$(\hat{\tau} ,\hat{\tau}_{x} )$ is
+$$
+\hat{\theta} = \frac{1}{n(n-1)} \sum_{i=1}^n (\hat{\tau}_{xi} - \hat{\tau}_{x})  (  \hat{\tau}_i- \hat{\tau} ).
+$$
+
+
+
+\section{Data analysis: stratification and regression}
+
+Use the dataset \texttt{homocyst} in the R package \texttt{senstrat}. 
+The outcome is \texttt{homocysteine}, the homocysteine level, and the treatment is \texttt{z}, where $z=1$ for a daily smoker and $z=0$ for a never smoker. Covariates are \texttt{female, age3, ed3, bmi3, pov2} with detailed explanations in the R package. \texttt{st} is a stratum indicator, defined by all the combinations of the discrete covariates.
+
+
+\begin{enumerate}
+[(1)]
+\item
+How many strata have only treated or control units? What is the proportion of the units in these strata? Drop these strata and perform a stratified analysis of the observational study. Report the point estimator, variance estimator and 95\% confidence interval for the average treatment effect.
+
+\item
+Run OLS of the outcome on the treatment indicator and covariates without interactions. Report the result.
+
+\item
+Apply Lin's estimator of the average treatment effect. Report the result. 
+
+
+\item
+Compare the results in the above three analyses. Which one is more credible?
+
+\end{enumerate}
+
+
+
+
+
+
+\section{More results on observational studies}
+
+
+ 
+The Hajek estimator differs from the Horvitz--Thompson estimator in the numerators. Show
+$$
+E\left\{  \sum_{i=1}^n  \frac{Z_i}{e(X_i)} \right\} = n,\quad
+E\left\{  \sum_{i=1}^n  \frac{1-Z_i}{1-e(X_i)} \right\} = n .
+$$
+ 
+
+
+\section{Re-analysis of \citet{rosenbaum1983assessing}}
+
+
+Use Table 1 of this paper. If you are interested, you can read the whole paper. It is a canonical paper. But for this problem, you only need Table 1. 
+
+\citet{rosenbaum1983assessing} fitted a logistic regression model for the propensity score and stratified the data into 5 subclasses. Because the treatment (Surgical versus Medical) is binary and the outcome is also binary (improved or not), they represented the data by a table. 
+
+
+Based on this table, estimate the average treatment effect, and report the 95\% confidence interval. 
+
+
+\bibliographystyle{apalike}
+\bibliography{causal}
+
+\end{document}
+
+
+

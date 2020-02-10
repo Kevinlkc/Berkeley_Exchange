@@ -1,0 +1,7 @@
+"0","# with standard error
+sqrt(sd(Y[Z == 1])^2 / length(Y[Z == 1]) + sd(Y[Z == 0])^2 / length(Y[Z == 0]))
+"
+"1","[1]"
+"1"," 2.655732"
+"1","
+"

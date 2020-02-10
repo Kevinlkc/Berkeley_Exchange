@@ -1,0 +1,8 @@
+"0","est = IV_Lin(Z, D, Y, X)"
+"0","estVar = IV_Lin_delta(Z, D, Y, X)"
+"0","print(paste(""The (covariate adjusted) point estimate of the treatment effect for "", colnames(Y)[i] ,"" is "", est$CACE, "" and the confidence interval is ["", est$CACE - 1.96*estVar,"","",est$CACE + 1.96*estVar,""]"", sep = """"))"
+"1","[1]"
+"1"," ""The (covariate adjusted) point estimate of the treatment effect for  is 0.827472400711612 and the confidence interval is [0.654979798690443,0.999965002732781]"""
+"1","
+"
+"0","# That's significantly different from zero."

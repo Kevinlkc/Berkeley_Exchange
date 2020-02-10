@@ -1,0 +1,2 @@
+"0","plot(rdd_data(x=x, y=y,cutpoint=0), "
+"0","     xlab = ""X"", ylab = ""Y"", cex = 0.3)"

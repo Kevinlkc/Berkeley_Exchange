@@ -1,0 +1,6 @@
+"0","print(paste(""One percent of increase in the effective drug intake leads to a decrease of 0.47 in the cholesterol level, assuming unconfoundedness conditioning on the compliance level. The confidence interval is ["", model$coef[""Z:D""] - 1.96*sqrt(hccm(model, type = ""hc0"")[2, 2]),"","",model$coefficients[""Z:D""] + 1.96*sqrt(hccm(model, type = ""hc0"")[2, 2]), ""]"", sep = """"))
+"
+"1","[1]"
+"1"," ""One percent of increase in the effective drug intake leads to a decrease of 0.47 in the cholesterol level, assuming unconfoundedness conditioning on the compliance level. The confidence interval is [-0.748974013231253,-0.189820517438327]"""
+"1","
+"

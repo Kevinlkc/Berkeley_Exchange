@@ -1,0 +1,3 @@
+"0","ggplot() +"
+"0","  geom_point(aes(x = card$educ, y = card$lwage)) + theme_bw() +"
+"0","  geom_smooth(aes(x = card$educ, y = card$lwage), color = ""maroon"")"

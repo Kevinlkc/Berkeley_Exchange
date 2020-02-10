@@ -1,0 +1,603 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} \% provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 \% if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else \% if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+\% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\% use microtype if available
+\IfFileExists{microtype.sty}{\%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} \% disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={hw5},
+            pdfauthor={Kaicheng Luo},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  \% don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+\% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+\% Scale images if necessary, so that they will not overflow the page
+\% margins by default, and it is still possible to overwrite the defaults
+\% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{\%
+\usepackage{parskip}
+}{\% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  \% prevent overfull lines
+\providecommand{\tightlist}{\%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+\% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\%\%\% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote\%
+\def\footnote{\protect\rmarkdownfootnote}
+
+\%\%\% Change title format to be more compact
+\usepackage{titling}
+
+\% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{hw5}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Kaicheng Luo}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2019/11/11}
+
+
+\begin{document}
+\maketitle
+
+\section*{Problem 4}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{## RDD numerical examples}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\NormalTok{n   =}\StringTok{ }\DecValTok{500}
+\NormalTok{x   =}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n)}
+\NormalTok{y0  =}\StringTok{ }\NormalTok{x}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{y1  =}\StringTok{ }\NormalTok{y0 }\OperatorTok{+}\StringTok{ }\DecValTok{5}
+\NormalTok{z   =}\StringTok{ }\NormalTok{(x}\OperatorTok{>=}\DecValTok{0}\NormalTok{)}
+\NormalTok{y   =}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{y1 }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{z)}\OperatorTok{*}\NormalTok{y0}
+\KeywordTok{png}\NormalTok{(}\StringTok{'plot0.png'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(y0 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{,}
+     \DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\KeywordTok{min}\NormalTok{(y), }\KeywordTok{max}\NormalTok{(y)),}
+     \DataTypeTok{xlab =} \StringTok{"X"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(y1 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =} \DecValTok{0}\NormalTok{, }\DataTypeTok{lty =} \DecValTok{2}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{png}\NormalTok{(}\StringTok{'plot1.png'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{rdd_data}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{y=}\NormalTok{y,}\DataTypeTok{cutpoint=}\DecValTok{0}\NormalTok{), }
+     \DataTypeTok{xlab =} \StringTok{"X"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.3}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# The point estimate, variance estimate, and confidence interval for the causal effect}
+\NormalTok{RDDest =}\StringTok{ }\KeywordTok{rdrobust}\NormalTok{(y, x)}
+\CommentTok{# Generally they're providing us with a good estimate of the causal effect (5)}
+\KeywordTok{cbind}\NormalTok{(RDDest}\OperatorTok{\$}\NormalTok{coef, RDDest}\OperatorTok{\$}\NormalTok{ci)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   Coeff CI Lower CI Upper
+## Conventional   5.054218 4.848778 5.259658
+## Bias-Corrected 5.049684 4.844244 5.255123
+## Robust         5.049684 4.804010 5.295357
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Lin's estimator}
+\NormalTok{Greg =}\StringTok{ }\KeywordTok{lm}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z }\OperatorTok{+}\StringTok{ }\NormalTok{x }\OperatorTok{+}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{x)}
+\KeywordTok{cbind}\NormalTok{(}\KeywordTok{coef}\NormalTok{(Greg)[}\DecValTok{2}\NormalTok{], }\KeywordTok{confint}\NormalTok{(Greg, }\StringTok{'zTRUE'}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                  2.5 \%   97.5 \%
+## zTRUE 4.97995 4.790766 5.169134
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Shrink the real effect}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\NormalTok{n   =}\StringTok{ }\DecValTok{500}
+\NormalTok{x   =}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n)}
+\NormalTok{y0  =}\StringTok{ }\NormalTok{x}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{y1  =}\StringTok{ }\NormalTok{y0 }\OperatorTok{+}\StringTok{ }\FloatTok{0.5}
+\NormalTok{z   =}\StringTok{ }\NormalTok{(x}\OperatorTok{>=}\DecValTok{0}\NormalTok{)}
+\NormalTok{y   =}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{y1 }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{z)}\OperatorTok{*}\NormalTok{y0}
+\KeywordTok{png}\NormalTok{(}\StringTok{"plot2.png"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(y0 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{,}
+     \DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\KeywordTok{min}\NormalTok{(y), }\KeywordTok{max}\NormalTok{(y)),}
+     \DataTypeTok{xlab =} \StringTok{"X"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(y1 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =} \DecValTok{0}\NormalTok{, }\DataTypeTok{lty =} \DecValTok{2}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{png}\NormalTok{(}\StringTok{'plot3.png'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{rdd_data}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{y=}\NormalTok{y,}\DataTypeTok{cutpoint=}\DecValTok{0}\NormalTok{), }
+     \DataTypeTok{xlab =} \StringTok{"X"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.3}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# The point estimate, variance estimate, and confidence interval for the causal effect}
+\NormalTok{RDDest =}\StringTok{ }\KeywordTok{rdrobust}\NormalTok{(y, x)}
+\CommentTok{# Stil, that's a pretty good estimate.}
+\KeywordTok{cbind}\NormalTok{(RDDest}\OperatorTok{\$}\NormalTok{coef, RDDest}\OperatorTok{\$}\NormalTok{ci)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                    Coeff  CI Lower  CI Upper
+## Conventional   0.5542181 0.3487782 0.7596579
+## Bias-Corrected 0.5496835 0.3442436 0.7551234
+## Robust         0.5496835 0.3040096 0.7953574
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Lin's estimator (Note that the advantage of RDD is that it does not require unconfoundednenss to hold.)}
+\NormalTok{Greg =}\StringTok{ }\KeywordTok{lm}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z }\OperatorTok{+}\StringTok{ }\NormalTok{x }\OperatorTok{+}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{x)}
+\KeywordTok{cbind}\NormalTok{(}\KeywordTok{coef}\NormalTok{(Greg)[}\DecValTok{2}\NormalTok{], }\KeywordTok{confint}\NormalTok{(Greg, }\StringTok{'zTRUE'}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                     2.5 \%    97.5 \%
+## zTRUE 0.4799505 0.2907665 0.6691345
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y0  =}\StringTok{ }\NormalTok{x}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{y1  =}\StringTok{ }\OperatorTok{-}\DecValTok{1}\OperatorTok{-}\FloatTok{0.5}\OperatorTok{*}\NormalTok{x}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{)}
+\NormalTok{z   =}\StringTok{ }\NormalTok{(x}\OperatorTok{>=}\DecValTok{0}\NormalTok{)}
+\NormalTok{y   =}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{y1 }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{z)}\OperatorTok{*}\NormalTok{y0}
+\KeywordTok{png}\NormalTok{(}\StringTok{"plot4.png"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(y0 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{,}
+     \DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\KeywordTok{min}\NormalTok{(y), }\KeywordTok{max}\NormalTok{(y)))}
+\KeywordTok{points}\NormalTok{(y1 }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{x, }\DataTypeTok{col =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{pch =} \DecValTok{19}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.1}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =} \DecValTok{0}\NormalTok{, }\DataTypeTok{lty =} \DecValTok{2}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{png}\NormalTok{(}\StringTok{'plot5.png'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{rdd_data}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{y=}\NormalTok{y,}\DataTypeTok{cutpoint=}\DecValTok{0}\NormalTok{), }
+     \DataTypeTok{xlab =} \StringTok{"X"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.3}\NormalTok{)}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# RDD is still robust assuming non-linear trend}
+\NormalTok{RDDest =}\StringTok{ }\KeywordTok{rdrobust}\NormalTok{(y, x)}
+\KeywordTok{cbind}\NormalTok{(RDDest}\OperatorTok{\$}\NormalTok{coef, RDDest}\OperatorTok{\$}\NormalTok{ci)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                     Coeff  CI Lower   CI Upper
+## Conventional   -0.9798502 -1.224561 -0.7351395
+## Bias-Corrected -1.0308944 -1.275605 -0.7861837
+## Robust         -1.0308944 -1.305329 -0.7564594
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Lin's estimator loses it power}
+\NormalTok{Greg =}\StringTok{ }\KeywordTok{lm}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z }\OperatorTok{+}\StringTok{ }\NormalTok{x }\OperatorTok{+}\StringTok{ }\NormalTok{z}\OperatorTok{*}\NormalTok{x)}
+\KeywordTok{cbind}\NormalTok{(}\KeywordTok{coef}\NormalTok{(Greg)[}\DecValTok{2}\NormalTok{], }\KeywordTok{confint}\NormalTok{(Greg, }\StringTok{'zTRUE'}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                       2.5 \%      97.5 \%
+## zTRUE -0.1962193 -0.3689827 -0.02345585
+\end{verbatim}
+
+\section*{Problem 5}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+                 \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+                 \DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+                 \DecValTok{74}\NormalTok{,}\DecValTok{11514}\NormalTok{,}\DecValTok{34}\NormalTok{,}\DecValTok{2385}\NormalTok{,}\DecValTok{12}\NormalTok{,}\DecValTok{9663}\NormalTok{), }\DataTypeTok{nrow =} \DecValTok{6}\NormalTok{,}\DataTypeTok{ncol =} \DecValTok{4}\NormalTok{)}
+\CommentTok{# Estimating ITT}
+\NormalTok{ITT <-}\StringTok{ }\NormalTok{(data[}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{data[}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{])}\OperatorTok{/}\NormalTok{(data[}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{data[}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{data[}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{data[}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{])}
+\CommentTok{# Estimating the Local Average Treatment Effect}
+\NormalTok{LATE <-}\StringTok{ }\NormalTok{(data[}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{data[}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{]) }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(data[}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{),}\DecValTok{4}\NormalTok{]) }\OperatorTok{-}\StringTok{ }\NormalTok{data[}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{] }\OperatorTok{/}\StringTok{ }\KeywordTok{sum}\NormalTok{(data[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DecValTok{4}\NormalTok{])}
+\NormalTok{tau <-}\StringTok{ }\NormalTok{LATE }\OperatorTok{/}\StringTok{ }\NormalTok{ITT}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"The Average Causal Effect (Estimated by IV) is "}\NormalTok{, tau, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The Average Causal Effect (Estimated by IV) is 0.0032280386285733"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{IV_Wald =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y)}
+\NormalTok{\{}
+\NormalTok{       tau_D =}\StringTok{ }\KeywordTok{mean}\NormalTok{(D[Z}\OperatorTok{==}\DecValTok{1}\NormalTok{]) }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(D[Z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}
+\NormalTok{       tau_Y =}\StringTok{ }\KeywordTok{mean}\NormalTok{(Y[Z}\OperatorTok{==}\DecValTok{1}\NormalTok{]) }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(Y[Z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}
+\NormalTok{       CACE  =}\StringTok{ }\NormalTok{tau_Y}\OperatorTok{/}\NormalTok{tau_D}
+       
+       \KeywordTok{return}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DataTypeTok{tau_D =}\NormalTok{ tau_D, }\DataTypeTok{tau_Y =}\NormalTok{ tau_Y,}
+                   \DataTypeTok{CACE  =}\NormalTok{ CACE))}
+\NormalTok{\}}
+
+\NormalTok{## IV se via the delta method}
+\NormalTok{IV_Wald_delta =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y)}
+\NormalTok{\{}
+\NormalTok{       est         =}\StringTok{ }\KeywordTok{IV_Wald}\NormalTok{(Z, D, Y)}
+\NormalTok{       AdjustedY   =}\StringTok{ }\NormalTok{Y }\OperatorTok{-}\StringTok{ }\NormalTok{D}\OperatorTok{*}\NormalTok{est}\OperatorTok{\$}\NormalTok{CACE}
+\NormalTok{       VarAdj      =}\StringTok{ }\KeywordTok{var}\NormalTok{(AdjustedY[Z}\OperatorTok{==}\DecValTok{1}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Z) }\OperatorTok{+}\StringTok{ }
+\StringTok{                          }\KeywordTok{var}\NormalTok{(AdjustedY[Z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{Z)}
+       \KeywordTok{return}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(VarAdj)}\OperatorTok{/}\KeywordTok{abs}\NormalTok{(est}\OperatorTok{\$}\NormalTok{tau_D))}
+\NormalTok{\}}
+
+\NormalTok{##IV se via the bootstrap}
+\NormalTok{IV_Wald_bootstrap =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y, }\DataTypeTok{n.boot =} \DecValTok{200}\NormalTok{)}
+\NormalTok{\{}
+\NormalTok{       CACEboot  =}\StringTok{ }\KeywordTok{replicate}\NormalTok{(n.boot,}
+\NormalTok{                   \{}
+\NormalTok{                   bindex =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(Z), }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)}
+                   \KeywordTok{IV_Wald}\NormalTok{(Z[bindex], D[bindex], Y[bindex])}\OperatorTok{\$}\NormalTok{CACE}
+\NormalTok{                   \})}
+       
+       \KeywordTok{return}\NormalTok{(}\KeywordTok{sd}\NormalTok{(CACEboot))}
+\NormalTok{\}}
+
+\NormalTok{## covariate adjustment in IV analysis}
+\NormalTok{IV_Lin =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y, X)}
+\NormalTok{\{}
+\NormalTok{  X     =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(X))}
+\NormalTok{  tau_D =}\StringTok{ }\KeywordTok{lm}\NormalTok{(D }\OperatorTok{~}\StringTok{ }\NormalTok{Z }\OperatorTok{+}\StringTok{ }\NormalTok{X }\OperatorTok{+}\StringTok{ }\NormalTok{Z}\OperatorTok{*}\NormalTok{X)}\OperatorTok{\$}\NormalTok{coef[}\DecValTok{2}\NormalTok{]}
+\NormalTok{  tau_Y =}\StringTok{ }\KeywordTok{lm}\NormalTok{(Y }\OperatorTok{~}\StringTok{ }\NormalTok{Z }\OperatorTok{+}\StringTok{ }\NormalTok{X }\OperatorTok{+}\StringTok{ }\NormalTok{Z}\OperatorTok{*}\NormalTok{X)}\OperatorTok{\$}\NormalTok{coef[}\DecValTok{2}\NormalTok{]}
+  \KeywordTok{names}\NormalTok{(tau_D) =}\StringTok{ }\OtherTok{NULL}
+  \KeywordTok{names}\NormalTok{(tau_Y) =}\StringTok{ }\OtherTok{NULL}
+\NormalTok{  CACE  =}\StringTok{ }\NormalTok{tau_Y}\OperatorTok{/}\NormalTok{tau_D}
+  
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DataTypeTok{tau_D =}\NormalTok{ tau_D, }\DataTypeTok{tau_Y =}\NormalTok{ tau_Y,}
+              \DataTypeTok{CACE  =}\NormalTok{ CACE))}
+\NormalTok{\}}
+
+\NormalTok{## IV_adj se via the delta method}
+\NormalTok{IV_Lin_delta =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y, X)}
+\NormalTok{\{}
+\NormalTok{  X      =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(X))}
+\NormalTok{  est    =}\StringTok{ }\KeywordTok{IV_Lin}\NormalTok{(Z, D, Y, X)}
+  
+\NormalTok{  betaY1 =}\StringTok{ }\KeywordTok{lm}\NormalTok{(Y }\OperatorTok{~}\StringTok{ }\NormalTok{X, }\DataTypeTok{subset =}\NormalTok{ (Z }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{))}\OperatorTok{\$}\NormalTok{coef[}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+\NormalTok{  betaY0 =}\StringTok{ }\KeywordTok{lm}\NormalTok{(Y }\OperatorTok{~}\StringTok{ }\NormalTok{X, }\DataTypeTok{subset =}\NormalTok{ (Z }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{))}\OperatorTok{\$}\NormalTok{coef[}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+\NormalTok{  betaD1 =}\StringTok{ }\KeywordTok{lm}\NormalTok{(D }\OperatorTok{~}\StringTok{ }\NormalTok{X, }\DataTypeTok{subset =}\NormalTok{ (Z }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{))}\OperatorTok{\$}\NormalTok{coef[}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+\NormalTok{  betaD0 =}\StringTok{ }\KeywordTok{lm}\NormalTok{(D }\OperatorTok{~}\StringTok{ }\NormalTok{X, }\DataTypeTok{subset =}\NormalTok{ (Z }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{))}\OperatorTok{\$}\NormalTok{coef[}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+  
+\NormalTok{  AdjustedY1   =}\StringTok{ }\NormalTok{Y }\OperatorTok{-}\StringTok{ }\NormalTok{X}\OperatorTok{\%*\%}\NormalTok{betaY1 }\OperatorTok{-}\StringTok{ }
+\StringTok{                     }\NormalTok{(D }\OperatorTok{-}\StringTok{ }\NormalTok{X}\OperatorTok{\%*\%}\NormalTok{betaD1)}\OperatorTok{*}\NormalTok{est}\OperatorTok{\$}\NormalTok{CACE}
+\NormalTok{  AdjustedY0   =}\StringTok{ }\NormalTok{Y }\OperatorTok{-}\StringTok{ }\NormalTok{X}\OperatorTok{\%*\%}\NormalTok{betaY0 }\OperatorTok{-}\StringTok{ }
+\StringTok{                     }\NormalTok{(D }\OperatorTok{-}\StringTok{ }\NormalTok{X}\OperatorTok{\%*\%}\NormalTok{betaD0)}\OperatorTok{*}\NormalTok{est}\OperatorTok{\$}\NormalTok{CACE}
+\NormalTok{  VarAdj       =}\StringTok{ }\KeywordTok{var}\NormalTok{(AdjustedY1[Z}\OperatorTok{==}\DecValTok{1}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Z) }\OperatorTok{+}\StringTok{ }
+\StringTok{                     }\KeywordTok{var}\NormalTok{(AdjustedY0[Z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{Z)}
+  
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(VarAdj)}\OperatorTok{/}\KeywordTok{abs}\NormalTok{(est}\OperatorTok{\$}\NormalTok{tau_D))}
+\NormalTok{\}}
+
+\NormalTok{##IV_adj se via the bootstrap}
+\NormalTok{IV_Lin_bootstrap =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(Z, D, Y, X, }\DataTypeTok{n.boot =} \DecValTok{200}\NormalTok{)}
+\NormalTok{\{}
+\NormalTok{  X         =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(X))}
+\NormalTok{  CACEboot  =}\StringTok{ }\KeywordTok{replicate}\NormalTok{(n.boot,}
+\NormalTok{                        \{}
+\NormalTok{                          bindex =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(Z), }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{)}
+                          \KeywordTok{IV_Lin}\NormalTok{(Z[bindex], D[bindex], Y[bindex], X[bindex])}\OperatorTok{\$}\NormalTok{CACE}
+\NormalTok{                        \})}
+  
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{var}\NormalTok{(CACEboot)))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\section*{Problem 6}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"fludata.txt"}\NormalTok{)}
+\CommentTok{# Without Covariates}
+\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(assign }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{summarise}\NormalTok{(}\KeywordTok{mean}\NormalTok{(receive))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   mean(receive)
+## 1     0.3077446
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ITT <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(assign }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{summarise}\NormalTok{(}\KeywordTok{mean}\NormalTok{(receive)) }\OperatorTok{-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(assign }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{summarise}\NormalTok{(}\KeywordTok{mean}\NormalTok{(receive))}
+\NormalTok{LATE <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(assign }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{summarise}\NormalTok{(}\KeywordTok{mean}\NormalTok{(outcome)) }\OperatorTok{-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{filter}\NormalTok{(assign }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{summarise}\NormalTok{(}\KeywordTok{mean}\NormalTok{(outcome))}
+\NormalTok{tau_IV <-}\StringTok{ }\NormalTok{LATE }\OperatorTok{/}\StringTok{ }\NormalTok{ITT}
+\CommentTok{# That's identical to the result by the function in class}
+\KeywordTok{IV_Wald}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome)}\OperatorTok{\$}\NormalTok{CACE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.1245575
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"The Average Causal Effect (Estimated by 2sls, without covariates) is "}\NormalTok{, tau_IV, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The Average Causal Effect (Estimated by 2sls, without covariates) is -0.124557482825996"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# This process can also be understood as a two-stage least square, which will offer identical results.}
+\CommentTok{# Stage 1}
+\NormalTok{model1 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(receive }\OperatorTok{~}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{assign, }\DataTypeTok{data =}\NormalTok{ data)}\OperatorTok{\$}\NormalTok{fitted.values}
+\CommentTok{# Stage 2}
+\NormalTok{model <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(data}\OperatorTok{\$}\NormalTok{outcome }\OperatorTok{~}\StringTok{  }\NormalTok{model1)}
+\NormalTok{model}\OperatorTok{\$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     model1 
+## -0.1245575
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# With Covariates (2SLS)}
+\KeywordTok{IV_Lin}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)])}\OperatorTok{\$}\NormalTok{CACE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.125214
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Variance Estimation}
+\KeywordTok{IV_Lin_delta}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.08844344
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# CI}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"CI: ["}\NormalTok{, }\KeywordTok{IV_Lin}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)])}\OperatorTok{\$}\NormalTok{CACE }\OperatorTok{-}\StringTok{ }\FloatTok{1.96}\OperatorTok{*}\KeywordTok{IV_Lin_delta}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)]) , }\StringTok{","}\NormalTok{,}\KeywordTok{IV_Lin}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)])}\OperatorTok{\$}\NormalTok{CACE }\OperatorTok{+}\StringTok{ }\FloatTok{1.96}\OperatorTok{*}\KeywordTok{IV_Lin_delta}\NormalTok{(data}\OperatorTok{\$}\NormalTok{assign, data}\OperatorTok{\$}\NormalTok{receive, data}\OperatorTok{\$}\NormalTok{outcome, data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{3}\NormalTok{)]),}\StringTok{"]"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "CI: [-0.298563111659852,0.0481351769249073]"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# # Stage 1}
+\CommentTok{# model1 <- lm(receive ~ .-outcome, data = data)}
+\CommentTok{# # Stage 2}
+\CommentTok{# model <- lm(data\$outcome ~ data\$age+ data\$copd+data\$dm+data\$heartd+data\$race+data\$race+data\$renal+data\$sex+data\$liverd + model1\$fitted.values)}
+\CommentTok{# print(paste("The Average Causal Effect (Estimated by IV, with covariates) is ", model\$coefficients['model1\$fitted.values'], sep = ""))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data <-}\StringTok{  }\KeywordTok{read.table}\NormalTok{(}\StringTok{"karolinska.txt"}\NormalTok{, }\DataTypeTok{header =}\NormalTok{ T)}
+\NormalTok{Y <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(data}\OperatorTok{\$}\NormalTok{YearsSurvivingAfterDiagnosis)}
+\NormalTok{X <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(data}\OperatorTok{\$}\NormalTok{HighVolTreatHosp)}
+\NormalTok{IV <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(data}\OperatorTok{\$}\NormalTok{HighVolDiagHosp)}
+\NormalTok{covariates <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(data}\OperatorTok{\$}\NormalTok{FromRuralArea, data}\OperatorTok{\$}\NormalTok{Male, data}\OperatorTok{\$}\NormalTok{AgeAtDiagnosis), }\DataTypeTok{ncol =} \DecValTok{3}\NormalTok{)}
+\CommentTok{# Lin's estimator (Unbiased)}
+\KeywordTok{IV_Lin}\NormalTok{(IV, X, Y, covariates)}\OperatorTok{\$}\NormalTok{CACE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.1849535
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Variance estimation}
+\KeywordTok{IV_Lin_delta}\NormalTok{(IV, X, Y, covariates)}\OperatorTok{^}\DecValTok{2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.04253986
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# The result is insignificant}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"CI: ["}\NormalTok{, }\KeywordTok{IV_Lin}\NormalTok{(IV, X, Y, covariates)}\OperatorTok{\$}\NormalTok{CACE }\OperatorTok{-}\StringTok{ }\FloatTok{1.96}\OperatorTok{*}\KeywordTok{IV_Lin_delta}\NormalTok{(IV, X, Y, covariates) , }\StringTok{","}\NormalTok{,}\KeywordTok{IV_Lin}\NormalTok{(IV, X, Y, covariates)}\OperatorTok{\$}\NormalTok{CACE }\OperatorTok{+}\StringTok{ }\FloatTok{1.96}\OperatorTok{*}\KeywordTok{IV_Lin_delta}\NormalTok{(IV, X, Y, covariates),}\StringTok{"]"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "CI: [-0.21930025888364,0.589207292815465]"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# With Covariates (2SLS)}
+\CommentTok{# Stage 1}
+\NormalTok{model1 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(X}\OperatorTok{~}\NormalTok{IV}\OperatorTok{+}\NormalTok{covariates }\OperatorTok{+}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{YearOfDiagnosis)}
+\CommentTok{# Stage 2}
+\NormalTok{model <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(Y}\OperatorTok{~}\NormalTok{model1}\OperatorTok{\$}\NormalTok{fitted.values }\OperatorTok{+}\StringTok{ }\NormalTok{covariates }\OperatorTok{+}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{YearOfDiagnosis)}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"The Average Causal Effect (Estimated by 2SLS, with covariates) is "}\NormalTok{, model}\OperatorTok{\$}\NormalTok{coefficients[}\StringTok{'model1\$fitted.values'}\NormalTok{], }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The Average Causal Effect (Estimated by 2SLS, with covariates) is 0.174521858685822"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Note that 2SLS is in itself biased with even larger std error 0.24}
+\NormalTok{temp <-}\StringTok{ }\KeywordTok{summary}\NormalTok{(model)}
+\NormalTok{temp}\OperatorTok{\$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2357129
+\end{verbatim}
+
+
+\end{document}

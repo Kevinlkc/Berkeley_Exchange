@@ -1,0 +1,16 @@
+\begin{thebibliography}{}
+
+\bibitem[Angrist and Lavy, 2009]{angrist_highschool}
+Angrist, J. and Lavy, V. (2009).
+\newblock The effects of high stakes high school achievement awards: Evidence
+  from a randomized trial.
+\newblock {\em The American Economic Review}, 99:1384--1414.
+
+\bibitem[Rosenbaum and Rubin, 1983]{rosenbaum1983assessing}
+Rosenbaum, P.~R. and Rubin, D.~B. (1983).
+\newblock Assessing sensitivity to an unobserved binary covariate in an
+  observational study with binary outcome.
+\newblock {\em Journal of the Royal Statistical Society, Series B
+  (Methodological)}, 45:212--218.
+
+\end{thebibliography}

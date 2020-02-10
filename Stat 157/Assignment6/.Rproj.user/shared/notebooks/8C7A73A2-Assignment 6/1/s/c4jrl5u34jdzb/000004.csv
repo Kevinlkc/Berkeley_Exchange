@@ -1,0 +1,7 @@
+"0","# With covariates (Note that we're somehow arbitrarily dropping all the observations with na values. That's based on the assumption that the NA values are uncorrelated with either the treatment assigned or the treatment received. However, it is possible that this is not the case. Further investigation is needed for those data.)"
+"0","# Note that we dropped all the data with south indicator 1 here, leading to NA values in the regression, so we drop them. We'll investigate the stability of our investigation in the later part of the analysis."
+"0","card <- na.omit(card)"
+"0","Y <- card$lwage"
+"0","Z <- card$nearc2"
+"0","D <- ifelse(card$educ > 12, 1, 0)"
+"0","X <- card %>% select(-id, -nearc2, -nearc4, -educ, -lwage, -south66, -reg669)"

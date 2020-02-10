@@ -1,0 +1,50 @@
+"0","## Baseline: simulation with correct models
+## Wrong Model for y1 and y0 but correct model for propensity score
+for(r in 1:n.sim)
+{
+  x       = matrix(rnorm(n*2), n, 2)
+  x1      = cbind(1, x)
+  beta.z  = c(0, 1, 1)
+  pscore  = 1/(1 + exp(- as.vector(x1%*%beta.z)))
+  z       = rbinom(n, 1, pscore)
+  beta.y1 = c(1, 2, 1)
+  beta.y0 = c(1, 1, 1)
+  realbeta.y1 = c(2, 3, 4)
+  realbeta.y0 = c(100, 101, 102)
+  y1      = rnorm(n, x1%*%realbeta.y1)
+  y0      = rnorm(n, x1%*%realbeta.y0)
+  y       = z*y1 + (1 - z)*y0
+  ATT0[r] = mean(y1[z==1]) - mean(y0[z==1])
+  
+  causaleffect = ObsCausal.ATT(z, y, x)
+  ATT[, r]     = causaleffect[1, ]
+  SEboot[, r]  = causaleffect[2, ]
+}
+apply(ATT, 1, mean) - mean(ATT0)
+"
+"1","[1]"
+"1"," 70.43409872"
+"1"," -0.02144962"
+"1","  8.39088988"
+"1","  7.60463984"
+"1"," -0.02595534"
+"1","
+"
+"0","apply(ATT, 1, sd)"
+"1","[1]"
+"1"," 11.17496"
+"1"," 13.03725"
+"1"," 39.95183"
+"1"," 24.99660"
+"1"," 13.06298"
+"1","
+"
+"0","apply(SEboot, 1, mean)"
+"1","[1]"
+"1"," 11.97605"
+"1"," 11.88492"
+"1"," 36.52448"
+"1"," 20.78798"
+"1"," 11.88497"
+"1","
+"

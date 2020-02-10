@@ -1,0 +1,253 @@
+---
+title: "hw1"
+author: "Kevin Luo"
+date: "2019/9/11"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(R.utils)
+library(foreign)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+#library(Matching)
+```
+
+\section*{1. Specification searches}
+\subsubsection*{1.1 Data Prep}
+```{r}
+dat <- read.table("cps1re74.csv",header=T)
+# unemployed
+dat$u74 <- as.numeric(dat$re74==0)
+dat$u75 <- as.numeric(dat$re75==0)
+## linear regression on the outcome
+lmoutcome = lm(re78 ~ ., data = dat)
+lmoutcome$coefficients['treat']
+lmoutcome = lm(re78 ~ treat, data = dat)
+```
+
+\subsubsection*{1.2 Function Design}
+Run 1024 linear regressions with subsets of covariates, and report the regression coefficients of the treatment. How many are positively significant, how many are negatively significant, and how many are not significant?
+```{r}
+alpha <- 0.05
+positive <- 0
+negative <- 0
+R2 <- rep(0,1024)
+
+# filter the dependent variable and treatment to ensure the 1-1 mapping
+# between our index and the variable
+ind_dat <- dat %>%
+  select(-"re78", -"treat")
+
+# The main idea here is to use bit-operation to perform the loop.
+# For each variable j, the index we created in listI[[1]][j] 
+# determined whether it shall be included in our lm.
+# Besides the statistical inference of the coefficient, we also report R^2
+for (i in 0:1023){
+  binaryI <- intToBin(i)
+  strI <- as.character(binaryI)
+  listI <- strsplit(strI, "")
+  modelSpecification <- "re78 ~ treat"
+  
+  # The model specification is hence decided and updated
+  # according to the different values of i
+  for (j in 1:nchar(strI)){
+    if (listI[[1]][j] == "1"){
+      modelSpecification <- paste(modelSpecification, "+", colnames(ind_dat)[j])
+    }
+  }
+  lmtemp <- lm(modelSpecification, data = dat)
+  R2[i+1] <- as.numeric(summary(lmtemp)['r.squared'])
+  if (summary(lmtemp)$coefficients['treat','Pr(>|t|)'] < alpha 
+      & lmtemp$coefficients['treat'] > 0){
+    positive <- positive + 1
+  }
+  if (summary(lmtemp)$coefficients['treat','Pr(>|t|)'] < alpha 
+      & lmtemp$coefficients['treat'] < 0){
+    negative <- negative + 1
+  }
+}
+negative
+positive
+```
+
+There're 198 negative significant coefficients of treatment and 125 positive ones. 
+```{r}
+# Also some interesting results concerning the choice of parameters.
+R2<- as.data.frame(R2)
+R2 %>%
+  mutate(index = 1:length(R2)) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = index, y = R2),color = 'maroon') +
+  labs(
+    title = "R-squared in Different Model Specification"
+  )
+# The model with the best prediction, in terms of maximizing the square of correlation, is
+which(R2 == max(R2))
+# which is the full model with all covariates!
+```
+
+
+\section*{2. More on racial discrimination}
+Conduct two subgroup analyses:
+```{r}
+resume = read.csv("resume.csv")
+
+# Subsetting
+male_resume <- resume %>%
+  filter(sex == "male")
+female_resume <- resume %>%
+  filter(sex == "female")
+
+male_table = table(male_resume$race, male_resume$call)
+male_table
+fisher.test(male_table)
+female_table = table(female_resume$race, female_resume$call)
+female_table
+fisher.test(female_table)
+```
+
+Within 95% confident level, racial discrimination for men-employers are insignificant, with a p-value around 0.53. Yet cincerning women employers, the observed odds ratio is significantly different from 0 (p<0.001). Though it might be irrigorous to jump to the conclusion that racial discrimination exists more in women's job market (Due to ommitted variable bias.) It's a clear indicator that women are, directly or indirectly, suffering more from the prejudice.
+
+\section*{3. Regression adjustment in the Fisher Randomization Test}
+\subsubsection*{3.1 Using the residuals}
+```{r, warning=FALSE, message=FALSE}
+library(Matching)
+data(lalonde)
+result <- lm(re78~ -treat, data = lalonde)
+z <- lalonde$treat
+y <- result$residuals
+
+# Monte-Carlo Simulation of data
+MC = 10^3
+Tauhat   = rep(0, MC)
+Student  = rep(0, MC)
+Wilcox   = rep(0, MC)
+Ks       = rep(0, MC)
+tau = t.test(y ~ z, var.equal = TRUE)$statistic
+t = t.test(y ~ z, var.equal = FALSE)$statistic
+w = wilcox.test(y ~ z)$statistic 
+ks = ks.test(y[z == 1], y[z == 0])$statistic
+
+extreme_tau = 0
+extreme_t = 0
+extreme_w = 0
+extreme_ks = 0
+for(mc in 1:MC){
+   zperm = sample(z)
+   temptau = t.test(y ~ zperm, var.equal = TRUE)$statistic 
+   tempt = t.test(y ~ zperm, var.equal = FALSE)$statistic
+   tempw = wilcox.test(y ~ zperm)$statistic 
+   tempks = ks.test(y[zperm == 1], y[zperm == 0])$statistic
+   if (abs(temptau) > abs(tau)){
+     extreme_tau <- extreme_tau + 1
+   }
+   if (abs(tempt) > abs(t)){
+     extreme_t <- extreme_t + 1
+   }
+   if (abs(tempw) < abs(w)){
+     extreme_w <- extreme_w + 1
+   }
+   if (abs(tempks) > abs(ks)){
+     extreme_ks <- extreme_ks + 1
+   }
+}
+```
+
+The exact p-value using tau-statistic is `r extreme_tau/MC`  
+The exact p-value using t-statistic is `r extreme_t/MC`  
+The exact p-value using w-statistic is `r extreme_w/MC`  
+The exact p-value using ks-statistic is `r extreme_ks/MC`  
+Those four p-values are jusified because the taking the residual in a regression is simply a de-mean operation, subtrating the conditional mean of the dependent variable given all the covariates other than treatment itself. The imbalance of covariates are hence controlled after the substraction. Almost always, it reduces the variance of our estimation.
+
+\subsubsection*{3.2 Using the residuals}
+```{r, warning=FALSE, message=FALSE}
+library(Matching)
+data(lalonde)
+z <- lalonde$treat
+y <- lalonde$re78
+
+# Monte-Carlo Simulation of data
+MC = 10^3
+current_coef <- lm(re78~., data = lalonde)$coefficients['treat']
+lm(re78~treat:., data = lalonde)$coef
+extreme_coef <- 0
+for(mc in 1:MC){
+  zperm = sample(z)
+  data_copy <- lalonde
+  data_copy$treat <- zperm
+  coef <- lm(re78~., data = data_copy)$coefficients['treat']
+  if (coef > current_coef){
+    extreme_coef = extreme_coef + 1
+  }
+}
+```
+
+The exact p-value using coef-statistic is `r extreme_coef/MC`  
+It's plausible to use coefficients as our statistic because it simply denotes the average treatment effect controlling all those covariates constant. It can be considered as the subtraction of two regression coefficients, indicating the difference in means. (See Lin(2013) for detailed discussion)
+
+\section*{5. Nonlinear causal estimands}
+\subsubsection*{5.1 Examples of the differents in estimands}
+Example for $\sigma_1 = \sigma_2$
+```{r}
+x <- seq(1,10,1)
+y <- seq(2,20,2)
+sigma_1 <- median(y) - median(x)
+sigma_2 <- median(y-x)
+sigma_1-sigma_2
+# As long as the sign of x', y' are the same, the equation holds.
+```
+
+Example for $\sigma_1 < \sigma_2$
+```{r}
+x <- seq(1,10,1)
+y[10] <- 2
+sigma_1 <- median(y) - median(x)
+sigma_2 <- median(y-x)
+sigma_1-sigma_2
+```
+
+Example for $\sigma_1 > \sigma_2$
+```{r}
+y <- seq(2,20,2)
+x[10] <- 1
+sigma_1 <- median(y) - median(x)
+sigma_2 <- median(y-x)
+sigma_1-sigma_2
+```
+
+\subsubsection*{Find the better one}
+Intuitively, the medium of differences, instead of the difference in medians makes more sense. When we're substracting the difference of the medians, the pre-treatment value and post-treatment value possibly will not be attributed to the same observation. In other words, we could be deriving a statistic based on some data that is meaningless in reality. So in most cases, chosing the first statistic is always a safe choice.
+However, it still depends on the scenario that we apply the statistic. The following example shows that, if our goal is, say, simply to get rid of some outliers. Given normal distributions of our original data, the difference-in-medians statistic show a better property -- with less bias and less variance as well.
+```{r}
+# Monte-Carlo Simulation
+# Assume that we already have the science table
+# Also assume some normal distributions of our treatment effect
+MC <- 1e4
+sum_of_squares_1 <- 0
+sum_of_squares_2 <- 0
+sum_1 <- 0
+sum_2 <- 0
+for (mc in 1:MC){
+  Before <- rnorm(1000,0,1)
+  treat <- c(rep(1,500), rep(0,500))
+  Treatment_effect <- rnorm(1000,1,1) * treat
+  Control_effect <- rnorm(1000,0,1) * (1-treat)
+  After <- Before + Treatment_effect + Control_effect
+  y <- After[1:500]
+  x <- After[501:1000]
+  sigma_1 <- median(y) - median(x)
+  sigma_2 <- median(y-x)
+  sum_of_squares_1 <- sum_of_squares_1 + (sigma_1-1)^2
+  sum_of_squares_2 <- sum_of_squares_2 + (sigma_2-1)^2
+  sum_1 <- sum_1 + sigma_1
+  sum_2 <- sum_2 + sigma_2
+}
+```
+
+
+
+

@@ -1,0 +1,179 @@
+\documentclass[11pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,head=.1in,nofoot]{geometry}
+
+\setlength{\footskip}{24pt} % Page number/footer spacing
+\usepackage{setspace,url,bm,amsmath} % For double-spacing, URL font, math symbols
+
+\usepackage{titlesec} % Section header formatting
+\titlelabel{\thetitle.\quad} % Section header formatting
+%\titleformat*{\section}{\bf\large\center\uppercase} % Section header formatting
+
+\usepackage{graphicx} % Graphics scaling
+\usepackage{bbm, amssymb}
+\usepackage{latexsym}
+\usepackage{caption}
+\usepackage[margin=20pt]{subcaption}
+\usepackage{hyperref, enumerate}
+\usepackage[all,import]{xy}
+
+\usepackage{hyperref}
+
+
+\usepackage[table]{xcolor}
+%\newcommand\x{\times}
+%\newcommand\y{\cellcolor{green!10}}
+\newcommand\y[1]{%
+  \colorbox{green!10}{$#1$}%
+}
+\newcommand{\GG}[1]{}
+
+\usepackage{amsthm}
+%\usepackage{undertilde}
+\usepackage{comment}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
+\newtheorem{excont}{Example}
+\renewcommand{\theexcont}{\theexample}
+
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+
+
+
+
+\usepackage{natbib} % ASA citation style
+\bibpunct{(}{)}{;}{a}{}{,} % ASA citation style
+
+\renewcommand{\refname}{REFERENCES} % Capitalize bibliography section header
+\usepackage{etoolbox} % Bibliography underfull/overfull box fix
+\apptocmd{\sloppy}{\hbadness 10000\relax}{}{} % Bibliography underfull/overfull box fix
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\DeclareMathOperator*{\Med}{Med}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\letas{\mathrel{\mathop{=}\limits^{\triangle}}}
+\def\ind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \end{picture}
+        }
+\def\nind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \put(1,0){{\it /}}
+         \end{picture}
+    }
+
+\def\AVar{\text{AsyVar}}
+\def\Var{\text{var}}
+\def\var{\text{var}}
+\def\Cov{\text{cov}}
+\def\cov{\text{cov}}
+\def\sumn{\sum_{i=1}^n}
+\def\summ{\sum_{j=1}^m}
+\def\convergeas{\stackrel{a.s.}{\longrightarrow}}
+\def\converged{\stackrel{d}{\longrightarrow}}
+\def\convergep{\stackrel{p}{\longrightarrow}}
+\def\iidsim{\stackrel{i.i.d.}{\sim}}
+\def\indsim{\stackrel{ind}{\sim}}
+\def\N{\mathcal{N}}
+\def\d{\textup{d}}
+\def\KL{\textsc{KL}}
+\def\obs{\textnormal{obs}}
+\newcommand{\pr}{\textnormal{pr}}
+\def\FRT{\text{Fisher randomization test}}
+\def\asim{\stackrel{\cdot}{\sim}}
+\def\DCE{\textsc{DCE}}
+
+\begin{document}
+\doublespacing
+\title{\bf  Problem Set 4\\
+Due November 4th, 6:35pm before class}
+\date{}
+\maketitle
+
+
+\section{Hajek estimator as a weighted least squares estimator}
+
+In an observational study with iid draws of $(Z_i, X_i, Y_i)_{i=1}^n  \sim (Z,X,Y)  $ where $Z_i$ is the binary treatment indicator, $X_i$ is the covariate, and $Y_i$ is the outcome for unit $i.$ Assume ignorability that $Z \ind \{  Y(1), Y(0)\} \mid X$, and define $e(X) = P(Z=1\mid X)$ as the propensity score. The Hajek estimator for the average causal effect is 
+$$
+\hat{\tau}^{\text{hajek}} =  \frac{  \sum_{i=1}^n  \frac{Z_i Y_i}{  \hat{e}(X_i) }  }{  \sum_{i=1}^n  \frac{Z_i }{  \hat{e}(X_i) }  }
+-  \frac{  \sum_{i=1}^n  \frac{(1-Z_i) Y_i}{ 1- \hat{e}(X_i) }  }{  \sum_{i=1}^n  \frac{1-Z_i }{ 1- \hat{e}(X_i) }  },
+$$
+where $\hat{e}(X_i)$ is the fitted value of the propensity score.
+
+Show that $\hat{\tau}^{\text{hajek}} $ is numerically identical to the coefficient of $Z_i$ in the weighted least squares fit of the $Y_i$'s on the $Z_i$'s, with weights $w_i$'s defined as 
+$$
+w_i = \frac{Z_i}{  \hat{e}(X_i)} +  \frac{1 - Z_i}{  1-  \hat{e}(X_i)} ,\qquad (i=1,\ldots, n)
+$$
+i.e., $\hat{\tau}^{\text{hajek}}  = \hat{\beta}$ where
+$$
+(\hat{\alpha}, \hat{\beta}) = \arg\min_{\alpha, \beta} \sum_{i=1}^n w_i(Y_i - \alpha - \beta Z_i)^2.
+$$
+
+
+ 
+
+
+\section{Data re-analyses}
+
+
+In ObservationalStudy.R, I analyze two datasets using regression imputation, two IPW and the doubly robust estimators. Reanalyze them using the propensity score stratification estimator and the Abadie--Imbens matching estimator. Compare these estimators. 
+
+Note that you should choose different number of strata for the propensity score stratification estimator, and check covariate balance. You should also choose different number of matches for the matching estimator. Are your results sensitive to your choices? 
+
+
+\section{Data re-analyses}
+
+
+In matchingmethods.R, I analyzed the LaLonde observational study using matching. Matching performs well because it gives an estimator that is close to the experimental gold standard. Reanalyze the data using the regression imputation, propensity score stratification, two IPW and the doubly robust estimators. Compare the results to the matching estimator and to the estimator from the experimental gold standard.
+
+Note that you have many choices. For example, the number of strata for stratification and the threshold to trim to data based on the estimated propensity scores. You may consider fitting different propensity score and outcome models, e.g., including some quadratic terms of the basic covariates. 
+
+This is a classic dataset and hundreds of papers have used it. You can read some references \citep{dehejia1999causal, hainmueller2012entropy} and you can also be creative in your own data analysis.
+
+
+
+\section{Data re-analyses}
+
+\citet{ho2007matching} is an influential paper in political science, based on which the authors have developed an R package MatchIt \citep{ho2011matchit}. \citet{ho2007matching} analyzed two datasets, both of which are available from the Harvard Dataverse.
+
+Reanalyze these two datasets using the methods discussed in class. 
+
+You can also try other methods as long as you can justify them. 
+
+
+
+\section{Simulation for the average causal effect on the treated units}
+
+
+In ATTest.R, I did some simple simulation under corrected models for the propensity score and the outcome. Run simulation under other scenarios: (1) the propensity score model is correct, but the outcome is not; (2) the outcome model is correct, but the propensity score model is not; (3) both models are wrong. 
+
+You can choose different model parameters, larger numbers of simulation and bootstrap replicates (I chose small numbers because of the time constraint in class). Report your findings, including at least the bias, variance, and variance estimator via the bootstrap. You can also report other properties of the estimators, for example, the asymptotic Normality and the coverage rates of the confidence intervals. 
+
+
+
+\bibliographystyle{apalike}
+\bibliography{causal}
+
+\end{document}
+
+
+

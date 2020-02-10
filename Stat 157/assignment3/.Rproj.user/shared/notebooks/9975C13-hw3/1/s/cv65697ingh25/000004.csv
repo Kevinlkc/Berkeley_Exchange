@@ -1,0 +1,6 @@
+"0","print(paste(""Confidence Interval = ["", tau_hat - 1.96*sqrt(V_hat), "","", tau_hat + 1.96*sqrt(V_hat), ""]"", sep = """"))
+"
+"1","[1]"
+"1"," ""Confidence Interval = [1.83204244036545,40.0346242263012]"""
+"1","
+"

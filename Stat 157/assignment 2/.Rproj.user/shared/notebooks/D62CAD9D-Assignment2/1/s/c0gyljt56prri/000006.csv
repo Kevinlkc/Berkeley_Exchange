@@ -1,0 +1,6 @@
+"0","data <- data %>%
+  mutate(race = ifelse(black==1, 1, 0)) %>%
+  mutate(race = ifelse(hispan == 1, 2, race))
+"
+"2","Error in ifelse(hispan == 1, 2, race) : 找不到对象'hispan'
+"

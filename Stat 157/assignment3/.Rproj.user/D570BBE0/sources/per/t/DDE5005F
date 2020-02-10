@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1571038550827.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3369209585",
+    "id" : "DDE5005F",
+    "lastKnownWriteTime" : 1569287849,
+    "last_content_update" : 1569287849,
+    "path" : "~/Desktop/10 Berkeley Exchange/Stat 157/hw3/FRTDarwinMP.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "25,22",
+        "scrollLine" : "2"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

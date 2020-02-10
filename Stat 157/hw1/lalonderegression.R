@@ -1,0 +1,20 @@
+#code to replicate analysis of Lalonde data
+rm(list=ls())
+library(foreign)
+
+dat <- read.table("cps1re74.csv",header=T)
+# unemployed
+dat$u74 <- as.numeric(dat$re74==0)
+dat$u75 <- as.numeric(dat$re75==0)
+
+head(dat)
+dim(dat)
+
+## linear regression on the outcome
+lmoutcome = lm(re78 ~ ., data = dat)
+summary(lmoutcome)$coef
+
+lmoutcome = lm(re78 ~ treat, data = dat)
+summary(lmoutcome)$coef
+
+

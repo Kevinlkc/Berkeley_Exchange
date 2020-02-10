@@ -1,0 +1,671 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} \% provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 \% if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else \% if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+\% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\% use microtype if available
+\IfFileExists{microtype.sty}{\%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} \% disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Assignment 2},
+            pdfauthor={Kaicheng Luo},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  \% don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+\% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+\% Scale images if necessary, so that they will not overflow the page
+\% margins by default, and it is still possible to overwrite the defaults
+\% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{\%
+\usepackage{parskip}
+}{\% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  \% prevent overfull lines
+\providecommand{\tightlist}{\%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+\% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\%\%\% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote\%
+\def\footnote{\protect\rmarkdownfootnote}
+
+\%\%\% Change title format to be more compact
+\usepackage{titling}
+
+\% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Assignment 2}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Kaicheng Luo}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2019/10/1}
+
+
+\begin{document}
+\maketitle
+
+\section*{Problem 2}\subsubsection*{Playing with a toy model of SRE}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# FRT for the Project STAR data in the Imbens–Rubin book}
+\CommentTok{# Note that here we collect the image manually}
+\NormalTok{data <-}\StringTok{ }\KeywordTok{read_excel}\NormalTok{(}\StringTok{"STAR.xlsx"}\NormalTok{)}
+
+\CommentTok{# Preparations}
+\CommentTok{# Step 1: Write a function that gives you all the statistics you want in SRE}
+\NormalTok{stat_SRE <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(stratum, treatment, y)\{}
+  \CommentTok{# Assume in our case that the stratum in arranged and indexed.}
+  \CommentTok{# If not, then re-code it to an index.}
+\NormalTok{  number =}\StringTok{ }\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(stratum))}
+\NormalTok{  tau =}\StringTok{ }\DecValTok{0}
+\NormalTok{  wil =}\StringTok{ }\DecValTok{0}
+\NormalTok{  r =}\StringTok{ }\DecValTok{0}
+  \CommentTok{# Calculate the three statistics as defined}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{number)\{}
+\NormalTok{    tempy =}\StringTok{ }\NormalTok{y[stratum }\OperatorTok{==}\StringTok{ }\NormalTok{i]}
+\NormalTok{    tempt =}\StringTok{ }\NormalTok{treatment[stratum }\OperatorTok{==}\StringTok{ }\NormalTok{i]}
+\NormalTok{    n =}\StringTok{ }\KeywordTok{length}\NormalTok{(tempy)}
+\NormalTok{    pi =}\StringTok{ }\NormalTok{n}\OperatorTok{/}\KeywordTok{length}\NormalTok{(y)}
+\NormalTok{    tau =}\StringTok{ }\NormalTok{tau }\OperatorTok{+}\StringTok{ }\NormalTok{pi}\OperatorTok{*}\NormalTok{(}\KeywordTok{mean}\NormalTok{(tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{])))}
+\NormalTok{    wil =}\StringTok{ }\NormalTok{wil }\OperatorTok{+}\StringTok{ }\KeywordTok{wilcox.test}\NormalTok{(tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{], tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{])}\OperatorTok{\$}\NormalTok{statistic }\OperatorTok{/}\StringTok{ }\NormalTok{(n}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+\NormalTok{    tempy =}\StringTok{ }\NormalTok{tempy }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(tempy)}
+\NormalTok{  \}}
+\NormalTok{  y <-}\StringTok{ }\KeywordTok{rank}\NormalTok{(y)}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(y))\{}
+    \ControlFlowTok{if}\NormalTok{ (treatment[i] }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{)\{}
+\NormalTok{      r =}\StringTok{ }\NormalTok{r }\OperatorTok{+}\StringTok{ }\NormalTok{y[i]}
+\NormalTok{    \}}
+\NormalTok{  \}}
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DataTypeTok{taus =}\NormalTok{ tau, }\DataTypeTok{wilcoxon =}\NormalTok{ wil, }\DataTypeTok{alignedRank =}\NormalTok{ r))}
+\NormalTok{\}}
+\CommentTok{# Then we can calculate the observed value}
+\NormalTok{obsValue <-}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{Stratum, data}\OperatorTok{\$}\NormalTok{Treatment, data}\OperatorTok{\$}\NormalTok{Y)}
+\NormalTok{obsValue}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         taus   wilcoxon.W  alignedRank 
+##    0.2278897    8.3000000 1362.5000000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 2: Write a function that permutes your data in strata}
+\NormalTok{permute <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(stratum, treatment)\{}
+\NormalTok{  ptreat <-}\StringTok{ }\KeywordTok{vector}\NormalTok{()}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(stratum)))\{}
+\NormalTok{    ptreat <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ptreat, }\KeywordTok{sample}\NormalTok{(treatment[stratum }\OperatorTok{==}\StringTok{ }\NormalTok{i]))}
+\NormalTok{  \}}
+  \KeywordTok{return}\NormalTok{(ptreat)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 3: Carry out Stratified Randomization Test}
+\NormalTok{MC =}\StringTok{ }\DecValTok{2000}
+\NormalTok{extreme =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{MC)\{}
+\NormalTok{  mcStat =}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{Stratum, }\KeywordTok{permute}\NormalTok{(data}\OperatorTok{\$}\NormalTok{Stratum, data}\OperatorTok{\$}\NormalTok{Treatment), data}\OperatorTok{\$}\NormalTok{Y)}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)\{}
+    \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(mcStat[j]) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(obsValue[j]))\{}
+\NormalTok{      extreme[j] =}\StringTok{ }\NormalTok{extreme[j] }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\CommentTok{# Tidy display of our result}
+\NormalTok{display <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Taus"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{1}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"V"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{2}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"Aligned Rank"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{3}\NormalTok{]}\OperatorTok{/}\NormalTok{MC)}
+\NormalTok{display}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Taus     V Aligned.Rank
+## 1 0.0325 0.086       0.0235
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# At 95\% significance level, we rejeect the sharp null hypothesis that there's no significant difference between outcomes within strata.}
+\end{Highlighting}
+\end{Shaded}
+
+\section*{Problem 3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Baseline Model with NO Strata}
+\CommentTok{# Compare it with the normal complete randomized experiment}
+\CommentTok{# Part 1: FRT}
+\CommentTok{# Step 4: Compare our results with the CRE}
+\KeywordTok{library}\NormalTok{(Matching)}
+\KeywordTok{data}\NormalTok{(}\StringTok{"lalonde"}\NormalTok{)}
+\NormalTok{z <-}\StringTok{ }\NormalTok{lalonde}\OperatorTok{\$}\NormalTok{treat}
+\NormalTok{y <-}\StringTok{ }\NormalTok{lalonde}\OperatorTok{\$}\NormalTok{re78}
+
+\CommentTok{# Monte-Carlo Simulation of data}
+\NormalTok{MC =}\StringTok{ }\DecValTok{2000}
+\NormalTok{Tauhat   =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, MC)}
+\NormalTok{Student  =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, MC)}
+\NormalTok{Wilcox   =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, MC)}
+\NormalTok{Ks       =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, MC)}
+\NormalTok{tau =}\StringTok{ }\KeywordTok{t.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z, }\DataTypeTok{var.equal =} \OtherTok{TRUE}\NormalTok{)}\OperatorTok{\$}\NormalTok{statistic}
+\NormalTok{t =}\StringTok{ }\KeywordTok{t.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z, }\DataTypeTok{var.equal =} \OtherTok{FALSE}\NormalTok{)}\OperatorTok{\$}\NormalTok{statistic}
+\NormalTok{w =}\StringTok{ }\KeywordTok{wilcox.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{z)}\OperatorTok{\$}\NormalTok{statistic }
+\NormalTok{ks =}\StringTok{ }\KeywordTok{ks.test}\NormalTok{(y[z }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{], y[z }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{])}\OperatorTok{\$}\NormalTok{statistic}
+
+\NormalTok{extreme_tau =}\StringTok{ }\DecValTok{0}
+\NormalTok{extreme_t =}\StringTok{ }\DecValTok{0}
+\NormalTok{extreme_w =}\StringTok{ }\DecValTok{0}
+\NormalTok{extreme_ks =}\StringTok{ }\DecValTok{0}
+\ControlFlowTok{for}\NormalTok{(mc }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{MC)\{}
+\NormalTok{   zperm =}\StringTok{ }\KeywordTok{sample}\NormalTok{(z)}
+\NormalTok{   temptau =}\StringTok{ }\KeywordTok{t.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{zperm, }\DataTypeTok{var.equal =} \OtherTok{TRUE}\NormalTok{)}\OperatorTok{\$}\NormalTok{statistic }
+\NormalTok{   tempt =}\StringTok{ }\KeywordTok{t.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{zperm, }\DataTypeTok{var.equal =} \OtherTok{FALSE}\NormalTok{)}\OperatorTok{\$}\NormalTok{statistic}
+\NormalTok{   tempw =}\StringTok{ }\KeywordTok{wilcox.test}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{zperm)}\OperatorTok{\$}\NormalTok{statistic }
+\NormalTok{   tempks =}\StringTok{ }\KeywordTok{ks.test}\NormalTok{(y[zperm }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{], y[zperm }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{])}\OperatorTok{\$}\NormalTok{statistic}
+   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(temptau) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(tau))\{}
+\NormalTok{     extreme_tau <-}\StringTok{ }\NormalTok{extreme_tau }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{   \}}
+   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(tempt) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(t))\{}
+\NormalTok{     extreme_t <-}\StringTok{ }\NormalTok{extreme_t }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{   \}}
+   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(tempw) }\OperatorTok{<}\StringTok{ }\KeywordTok{abs}\NormalTok{(w))\{}
+\NormalTok{     extreme_w <-}\StringTok{ }\NormalTok{extreme_w }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{   \}}
+   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(tempks) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(ks))\{}
+\NormalTok{     extreme_ks <-}\StringTok{ }\NormalTok{extreme_ks }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{   \}}
+\NormalTok{\}}
+\CommentTok{# Tidy display of our result}
+\NormalTok{display_CRE <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Tau"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme_tau}\OperatorTok{/}\NormalTok{MC, }\StringTok{"t"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme_t}\OperatorTok{/}\NormalTok{MC, }\StringTok{"Wilcoxon"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme_w}\OperatorTok{/}\NormalTok{MC, }\StringTok{"KS"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme_ks }\OperatorTok{/}\StringTok{ }\NormalTok{MC)}
+\NormalTok{display_CRE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      Tau     t Wilcoxon    KS
+## 1 0.0055 0.009   0.0055 0.039
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Part 2: Neymanian Inference}
+\KeywordTok{library}\NormalTok{(Matching)}
+\KeywordTok{data}\NormalTok{(lalonde)}
+\KeywordTok{head}\NormalTok{(lalonde)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   age educ black hisp married nodegr re74 re75     re78 u74 u75 treat
+## 1  37   11     1    0       1      1    0    0  9930.05   1   1     1
+## 2  22    9     0    1       0      1    0    0  3595.89   1   1     1
+## 3  30   12     1    0       0      0    0    0 24909.50   1   1     1
+## 4  27   11     1    0       0      1    0    0  7506.15   1   1     1
+## 5  33    8     1    0       0      1    0    0   289.79   1   1     1
+## 6  22    9     1    0       0      1    0    0  4056.49   1   1     1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{z =}\StringTok{ }\NormalTok{lalonde}\OperatorTok{\$}\NormalTok{treat}
+\NormalTok{y =}\StringTok{ }\NormalTok{lalonde}\OperatorTok{\$}\NormalTok{re78}
+
+\NormalTok{## Neymanian inference}
+\NormalTok{n1=}\StringTok{ }\KeywordTok{sum}\NormalTok{(z)}
+\NormalTok{n0=}\StringTok{ }\KeywordTok{length}\NormalTok{(z) }\OperatorTok{-}\StringTok{ }\NormalTok{n1}
+\NormalTok{tauhat =}\StringTok{ }\KeywordTok{mean}\NormalTok{(y[z}\OperatorTok{==}\DecValTok{1}\NormalTok{]) }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(y[z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}
+\NormalTok{vhat   =}\StringTok{ }\KeywordTok{var}\NormalTok{(y[z}\OperatorTok{==}\DecValTok{1}\NormalTok{])}\OperatorTok{/}\NormalTok{n1 }\OperatorTok{+}\StringTok{ }\KeywordTok{var}\NormalTok{(y[z}\OperatorTok{==}\DecValTok{0}\NormalTok{])}\OperatorTok{/}\NormalTok{n0}
+\NormalTok{sehat  =}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(vhat)}
+\NormalTok{tauhat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1794.343
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sehat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 670.9967
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 0: Some data-cleaning presumed here as I'm implementing my own function of SRE}
+\KeywordTok{library}\NormalTok{(Matching)}
+\KeywordTok{data}\NormalTok{(lalonde)}
+\NormalTok{data <-}\StringTok{ }\NormalTok{lalonde}
+\NormalTok{data <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{race =} \KeywordTok{ifelse}\NormalTok{(black}\OperatorTok{==}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)) }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{race =} \KeywordTok{ifelse}\NormalTok{(hisp }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, race))}
+\NormalTok{data <-}\StringTok{ }\NormalTok{data[,}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{3}\NormalTok{,}\OperatorTok{-}\DecValTok{4}\NormalTok{)]}
+\NormalTok{data}\OperatorTok{\$}\NormalTok{race <-}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{race }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{data <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\DataTypeTok{by =}\NormalTok{ race)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 1: Pretend that the SRE is done by blocking race}
+\CommentTok{# Part 1: Fisher Randomization test}
+\NormalTok{MC =}\StringTok{ }\DecValTok{2000}
+\NormalTok{extreme =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{obsValue <-}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{race, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{obsValue}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        taus  wilcoxon.W alignedRank 
+##  1794.96905    60.50269 44607.50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{MC)\{}
+\NormalTok{  mcStat =}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{race, }\KeywordTok{permute}\NormalTok{(data}\OperatorTok{\$}\NormalTok{race, data}\OperatorTok{\$}\NormalTok{treat), data}\OperatorTok{\$}\NormalTok{re78)}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)\{}
+    \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(mcStat[j]) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(obsValue[j]))\{}
+\NormalTok{      extreme[j] =}\StringTok{ }\NormalTok{extreme[j] }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\CommentTok{# Tidy display of our result}
+\NormalTok{display1 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Taus"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{1}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"V"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{2}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"Aligned Rank"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{3}\NormalTok{]}\OperatorTok{/}\NormalTok{MC)}
+\NormalTok{display1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Taus      V Aligned.Rank
+## 1 0.005 0.0045        0.004
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 1: Pretend that the SRE is done by blocking race}
+\CommentTok{# Part 2: Neymanian Inference}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{c}\NormalTok{ (}\StringTok{"The point estimator is"}\NormalTok{, obsValue[}\DecValTok{1}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                              taus 
+## "The point estimator is"       "1794.96904513932"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{var_neyman <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(stratum, treatment, y)\{}
+\NormalTok{  V =}\StringTok{ }\DecValTok{0}
+  \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(stratum)))\{}
+\NormalTok{    tempy =}\StringTok{ }\NormalTok{y[stratum }\OperatorTok{==}\StringTok{ }\NormalTok{i]}
+\NormalTok{    tempt =}\StringTok{ }\NormalTok{treatment[stratum }\OperatorTok{==}\StringTok{ }\NormalTok{i]}
+\NormalTok{    n =}\StringTok{ }\KeywordTok{length}\NormalTok{(tempy)}
+\NormalTok{    y0 =}\StringTok{ }\NormalTok{tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{]}
+\NormalTok{    y1 =}\StringTok{ }\NormalTok{tempy[tempt }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{]}
+\NormalTok{    V =}\StringTok{ }\NormalTok{V }\OperatorTok{+}\StringTok{ }\NormalTok{(}\KeywordTok{length}\NormalTok{(y0)}\OperatorTok{/}\NormalTok{n)}\OperatorTok{^}\DecValTok{2} \OperatorTok{*}\StringTok{ }\NormalTok{(}\KeywordTok{sd}\NormalTok{(y0)}\OperatorTok{/}\KeywordTok{length}\NormalTok{(y0) }\OperatorTok{+}\StringTok{ }\KeywordTok{sd}\NormalTok{(y1)}\OperatorTok{/}\KeywordTok{length}\NormalTok{(y1))}
+\NormalTok{  \}}
+  \KeywordTok{return}\NormalTok{(V)}
+\NormalTok{\}}
+\NormalTok{SRE_race <-}\StringTok{ }\KeywordTok{var_neyman}\NormalTok{(data}\OperatorTok{\$}\NormalTok{race, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{SRE_race}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 610.8122
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 2: Pretend that the SRE is done by blocking marital status}
+\CommentTok{# Part 1: FRT}
+\NormalTok{data}\OperatorTok{\$}\NormalTok{married <-}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{married }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{data <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{arrange}\NormalTok{(}\DataTypeTok{by=}\NormalTok{married)}
+\NormalTok{MC =}\StringTok{ }\DecValTok{2000}
+\NormalTok{extreme =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{obsValue <-}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{married, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{obsValue}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        taus  wilcoxon.W alignedRank 
+##  1767.17517    61.02082 44607.50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{MC)\{}
+\NormalTok{  mcStat =}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{married, }\KeywordTok{permute}\NormalTok{(data}\OperatorTok{\$}\NormalTok{married, data}\OperatorTok{\$}\NormalTok{treat), data}\OperatorTok{\$}\NormalTok{re78)}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)\{}
+    \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(mcStat[j]) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(obsValue[j]))\{}
+\NormalTok{      extreme[j] =}\StringTok{ }\NormalTok{extreme[j] }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\CommentTok{# Tidy display of our result}
+\NormalTok{display2 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Taus"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{1}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"V"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{2}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"Aligned Rank"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{3}\NormalTok{]}\OperatorTok{/}\NormalTok{MC)}
+\NormalTok{display2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Taus     V Aligned.Rank
+## 1 0.0035 0.004        0.004
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 2: Pretend that the SRE is done by blocking marital status}
+\CommentTok{# Part 2: Neymanian Inference}
+\NormalTok{SRE_marriage <-}\StringTok{ }\KeywordTok{var_neyman}\NormalTok{(data}\OperatorTok{\$}\NormalTok{married, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{SRE_marriage}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 127.7127
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 3: Pretend that the SRE is done by blocking nodegr}
+\CommentTok{# Part 1: FRT}
+\NormalTok{data}\OperatorTok{\$}\NormalTok{nodegr =}\StringTok{ }\NormalTok{data}\OperatorTok{\$}\NormalTok{nodegr }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{data <-}\StringTok{ }\NormalTok{data }\OperatorTok{\%>\%}\StringTok{ }\KeywordTok{arrange}\NormalTok{(}\DataTypeTok{by =}\NormalTok{ nodegr)}
+\NormalTok{MC =}\StringTok{ }\DecValTok{2000}
+\NormalTok{extreme =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{obsValue <-}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{nodegr, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{obsValue}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        taus  wilcoxon.W alignedRank 
+##  1598.28122    59.17541 44607.50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{MC)\{}
+\NormalTok{  mcStat =}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(data}\OperatorTok{\$}\NormalTok{nodegr, }\KeywordTok{permute}\NormalTok{(data}\OperatorTok{\$}\NormalTok{nodegr, data}\OperatorTok{\$}\NormalTok{treat), data}\OperatorTok{\$}\NormalTok{re78)}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)\{}
+    \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{abs}\NormalTok{(mcStat[j]) }\OperatorTok{>}\StringTok{ }\KeywordTok{abs}\NormalTok{(obsValue[j]))\{}
+\NormalTok{      extreme[j] =}\StringTok{ }\NormalTok{extreme[j] }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\CommentTok{# Tidy display of our result}
+\NormalTok{display3 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"Taus"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{1}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"V"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{2}\NormalTok{]}\OperatorTok{/}\NormalTok{MC, }\StringTok{"Aligned Rank"}\NormalTok{ =}\StringTok{ }\NormalTok{extreme[}\DecValTok{3}\NormalTok{]}\OperatorTok{/}\NormalTok{MC)}
+\NormalTok{display3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Taus     V Aligned.Rank
+## 1 0.0135 0.014       0.0125
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Step 3: Pretend that the SRE is done by blocking nodegr}
+\CommentTok{# Part 2: Neymanian Inference}
+\NormalTok{SRE_edu <-}\StringTok{ }\KeywordTok{var_neyman}\NormalTok{(data}\OperatorTok{\$}\NormalTok{nodegr, data}\OperatorTok{\$}\NormalTok{treat, data}\OperatorTok{\$}\NormalTok{re78)}
+\NormalTok{SRE_edu}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 88.97333
+\end{verbatim}
+
+\subsubsection*{3.2 Regression adjusments for Penn}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{penndata =}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"Penn46_ascii.txt"}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(penndata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     duration treatment female black hispanic ndependents recall young old
+## 1  18.011343         0      0     0        0           2      0     0   0
+## 4   1.003399         0      0     0        0           0      0     0   0
+## 5  26.960396         0      0     0        0           0      0     0   0
+## 6   7.009044         1      0     0        0           0      0     0   0
+## 12  9.022409         1      0     0        0           0      0     1   0
+## 13 26.991390         0      0     0        0           1      0     0   1
+##    quarter durable lusd
+## 1        5       0    0
+## 4        5       0    1
+## 5        4       0    1
+## 6        2       0    0
+## 12       3       0    0
+## 13       5       1    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{z =}\StringTok{ }\NormalTok{penndata}\OperatorTok{\$}\NormalTok{treatment}
+\NormalTok{penndata}\OperatorTok{\$}\NormalTok{duration =}\StringTok{ }\KeywordTok{log}\NormalTok{(penndata}\OperatorTok{\$}\NormalTok{duration)}
+\NormalTok{y =}\StringTok{ }\KeywordTok{lm}\NormalTok{(duration }\OperatorTok{~}\StringTok{ }\NormalTok{.}\OperatorTok{-}\NormalTok{treatment, }\DataTypeTok{data =}\NormalTok{ penndata)}\OperatorTok{\$}\NormalTok{residuals}
+\NormalTok{penndata <-}\StringTok{ }\NormalTok{penndata }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{quarter =}\NormalTok{ quarter }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{\%>\%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\DataTypeTok{by =}\NormalTok{ quarter)}
+\NormalTok{obsValue =}\StringTok{ }\KeywordTok{stat_SRE}\NormalTok{(penndata}\OperatorTok{\$}\NormalTok{quarter, penndata}\OperatorTok{\$}\NormalTok{treatment, y)}
+\CommentTok{# The point estimator}
+\NormalTok{obsValue[}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        taus 
+## -0.01150982
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SRE_adjusted <-}\StringTok{ }\KeywordTok{var_neyman}\NormalTok{(penndata}\OperatorTok{\$}\NormalTok{quarter, penndata}\OperatorTok{\$}\NormalTok{treatment, y)}
+\NormalTok{SRE_adjusted}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.02450576
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Interval estimation}
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"["}\NormalTok{,obsValue[}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\NormalTok{SRE_adjusted}\OperatorTok{*}\FloatTok{1.96}\NormalTok{,}\StringTok{","}\NormalTok{,obsValue[}\DecValTok{1}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{SRE_adjusted}\OperatorTok{*}\FloatTok{1.96}\NormalTok{,}\StringTok{"]"}\NormalTok{), }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "[ -0.0595410962445224 , 0.0365214636256135 ]"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Neyman_SRE =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(z, y, x)}
+\NormalTok{\{}
+\NormalTok{       xlevels =}\StringTok{ }\KeywordTok{unique}\NormalTok{(x)}
+\NormalTok{       K       =}\StringTok{ }\KeywordTok{length}\NormalTok{(xlevels)}
+\NormalTok{       PiK     =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, K)}
+\NormalTok{       TauK    =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, K)}
+\NormalTok{       varK    =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, K)}
+       \ControlFlowTok{for}\NormalTok{(k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{K)}
+\NormalTok{       \{}
+\NormalTok{             xk         =}\StringTok{ }\NormalTok{xlevels[k]}
+\NormalTok{             zk         =}\StringTok{ }\NormalTok{z[x }\OperatorTok{==}\StringTok{ }\NormalTok{xk]}
+\NormalTok{             yk         =}\StringTok{ }\NormalTok{y[x }\OperatorTok{==}\StringTok{ }\NormalTok{xk]}
+\NormalTok{             PiK[k]     =}\StringTok{ }\KeywordTok{length}\NormalTok{(zk)}\OperatorTok{/}\KeywordTok{length}\NormalTok{(z)}
+\NormalTok{             TauK[k]    =}\StringTok{ }\KeywordTok{mean}\NormalTok{(yk[zk}\OperatorTok{==}\DecValTok{1}\NormalTok{]) }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(yk[zk}\OperatorTok{==}\DecValTok{0}\NormalTok{])}
+\NormalTok{             varK[k]    =}\StringTok{ }\KeywordTok{var}\NormalTok{(yk[zk}\OperatorTok{==}\DecValTok{1}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(zk) }\OperatorTok{+}\StringTok{ }
+\StringTok{                               }\KeywordTok{var}\NormalTok{(yk[zk}\OperatorTok{==}\DecValTok{0}\NormalTok{])}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{zk)}
+\NormalTok{       \}}
+       
+       \KeywordTok{return}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{sum}\NormalTok{(PiK}\OperatorTok{*}\NormalTok{TauK), }\KeywordTok{sum}\NormalTok{(PiK}\OperatorTok{^}\DecValTok{2}\OperatorTok{*}\NormalTok{varK)))}
+\NormalTok{\}}
+
+\NormalTok{## pennsylvania re-employment bonus experiment}
+\NormalTok{## description of the DATA: }
+\NormalTok{## Koenker and Xiao 2002 Econometrica }
+\NormalTok{## "Inference on the Quantile Regression Process" }
+
+\NormalTok{penndata =}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"Penn46_ascii.txt"}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(penndata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     duration treatment female black hispanic ndependents recall young old
+## 1  18.011343         0      0     0        0           2      0     0   0
+## 4   1.003399         0      0     0        0           0      0     0   0
+## 5  26.960396         0      0     0        0           0      0     0   0
+## 6   7.009044         1      0     0        0           0      0     0   0
+## 12  9.022409         1      0     0        0           0      0     1   0
+## 13 26.991390         0      0     0        0           1      0     0   1
+##    quarter durable lusd
+## 1        5       0    0
+## 4        5       0    1
+## 5        4       0    1
+## 6        2       0    0
+## 12       3       0    0
+## 13       5       1    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{z =}\StringTok{ }\NormalTok{penndata}\OperatorTok{\$}\NormalTok{treatment}
+\NormalTok{y =}\StringTok{ }\KeywordTok{log}\NormalTok{(penndata}\OperatorTok{\$}\NormalTok{duration)}
+\NormalTok{block =}\StringTok{ }\NormalTok{penndata}\OperatorTok{\$}\NormalTok{quarter}
+\NormalTok{est =}\StringTok{ }\KeywordTok{Neyman_SRE}\NormalTok{(z, y, block)}
+\NormalTok{est[}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.08990646
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sqrt}\NormalTok{(est[}\DecValTok{2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03079775
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"["}\NormalTok{,est[}\DecValTok{1}\NormalTok{]}\OperatorTok{-}\FloatTok{1.96}\OperatorTok{*}\KeywordTok{sqrt}\NormalTok{(est[}\DecValTok{2}\NormalTok{]),}\StringTok{","}\NormalTok{,est[}\DecValTok{1}\NormalTok{]}\OperatorTok{+}\KeywordTok{sqrt}\NormalTok{(est[}\DecValTok{2}\NormalTok{]),}\StringTok{"]"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "[ -0.150270048386588 , -0.0591087093146378 ]"
+\end{verbatim}
+
+
+\end{document}

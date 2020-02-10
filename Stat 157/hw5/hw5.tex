@@ -1,0 +1,196 @@
+\documentclass[11pt]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,head=.1in,nofoot]{geometry}
+
+\setlength{\footskip}{24pt} % Page number/footer spacing
+\usepackage{setspace,url,bm,amsmath} % For double-spacing, URL font, math symbols
+
+\usepackage{titlesec} % Section header formatting
+\titlelabel{\thetitle.\quad} % Section header formatting
+%\titleformat*{\section}{\bf\large\center\uppercase} % Section header formatting
+
+\usepackage{graphicx} % Graphics scaling
+\usepackage{bbm, amssymb}
+\usepackage{latexsym}
+\usepackage{caption}
+\usepackage[margin=20pt]{subcaption}
+\usepackage{hyperref, enumerate}
+\usepackage[all,import]{xy}
+
+\usepackage{hyperref}
+
+
+\usepackage[table]{xcolor}
+%\newcommand\x{\times}
+%\newcommand\y{\cellcolor{green!10}}
+\newcommand\y[1]{%
+  \colorbox{green!10}{$#1$}%
+}
+\newcommand{\GG}[1]{}
+
+\usepackage{amsthm}
+%\usepackage{undertilde}
+\usepackage{comment}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
+\newtheorem{excont}{Example}
+\renewcommand{\theexcont}{\theexample}
+
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+
+
+
+
+\usepackage{natbib} % ASA citation style
+\bibpunct{(}{)}{;}{a}{}{,} % ASA citation style
+
+\renewcommand{\refname}{REFERENCES} % Capitalize bibliography section header
+\usepackage{etoolbox} % Bibliography underfull/overfull box fix
+\apptocmd{\sloppy}{\hbadness 10000\relax}{}{} % Bibliography underfull/overfull box fix
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\DeclareMathOperator*{\Med}{Med}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\letas{\mathrel{\mathop{=}\limits^{\triangle}}}
+\def\ind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \end{picture}
+        }
+\def\nind{\begin{picture}(9,8)
+         \put(0,0){\line(1,0){9}}
+         \put(3,0){\line(0,1){8}}
+         \put(6,0){\line(0,1){8}}
+         \put(1,0){{\it /}}
+         \end{picture}
+    }
+
+\def\AVar{\text{AsyVar}}
+\def\Var{\text{var}}
+\def\var{\text{var}}
+\def\Cov{\text{cov}}
+\def\cov{\text{cov}}
+\def\sumn{\sum_{i=1}^n}
+\def\summ{\sum_{j=1}^m}
+\def\convergeas{\stackrel{a.s.}{\longrightarrow}}
+\def\converged{\stackrel{d}{\longrightarrow}}
+\def\convergep{\stackrel{p}{\longrightarrow}}
+\def\iidsim{\stackrel{i.i.d.}{\sim}}
+\def\indsim{\stackrel{ind}{\sim}}
+\def\N{\mathcal{N}}
+\def\d{\textup{d}}
+\def\KL{\textsc{KL}}
+\def\obs{\textnormal{obs}}
+\newcommand{\pr}{\textnormal{pr}}
+\def\FRT{\text{Fisher randomization test}}
+\def\asim{\stackrel{\cdot}{\sim}}
+\def\DCE{\textsc{DCE}}
+
+\begin{document}
+\doublespacing
+\title{\bf  Problem Set 5\\
+Due November 18th, 6:30 pm
+}
+\date{}
+\maketitle
+
+
+ 
+\section{Linear expansions of the matching estimators}
+Lecture 12 states that $\hat{\tau}^\textup{mbc}  
+= n^{-1} \sumn \hat{\psi}_i$ and $\hat{\tau}_\textsc{T}^\textup{mbc}  =   n_1^{-1} \sumn \hat{\psi}_{\textsc{T}, i}$ without proving them. Prove these results. 
+
+
+\section{Z-bias}
+ Lecture 13 Section 4.2 gives the bias of $\tau_{\textup{unadj}}$ and $\tau_{\textup{adj}}$ without proving them. Prove these results. 
+
+
+\section{Cochran's formula or the omitted variable bias formula (for Stat 260 only)}
+
+The following result is due to Yule and Fisher, although Sir David Cox calls it Cochran's formula and econometricians call it the omitted variable bias formula. It is also a sister of the Frisch--Waugh--Lovell Theorem.  
+
+The formula has two versions. All vectors are column vectors, as in R. 
+
+\begin{enumerate}
+[(1)]
+\item
+(Population version) Assume $(y_i, x_{1i}, x_{2i})_{i=1}^n$ are iid, where $y_i$ is a scalar, $x_{i1}$ has dimension $K$, and $x_{i2}$ has dimension $L$. 
+
+We have the following OLS decompositions of random variables
+\begin{eqnarray}
+y_i &=& \beta_1 ' x_{i1} + \beta_2' x_{2i} + \varepsilon_i , \label{eq::long}\\
+y_i&=&\gamma' x_{i1} + e_i, \label{eq::short}\\
+x_{i2} &=& \delta' x_{i1} + v_i . \label{eq::inter}
+\end{eqnarray}
+Equation \eqref{eq::long} is called the long regression, and Equation \eqref{eq::short} is called the short regression. In Equation \eqref{eq::inter}, $\delta$ is a matrix because it is a regression of a vector on a vector. You can view \eqref{eq::inter} as regression of each component of $x_{i2}$ on $x_{i1}$. 
+
+Show that $\gamma = \beta_1 + \delta \beta_2.$
+
+
+\item
+(Sample version) We have an $n\times 1$ vector $Y$, an $n\times K$ matrix $X_1$, and an $n\times L$ matrix $X_2$. We do not assume any randomness. All results below are purely linear algebra. 
+
+We can fit the following OLS, for example, using R, to obtain
+\begin{eqnarray*}
+Y &=& X_1 \hat{\beta}_1 + X_2 \hat{\beta}_2+ \hat{\varepsilon},\\
+Y &=& X_1 \hat{\gamma} + \hat{e} ,\\
+X_2 &=& X_1 \hat{\delta} + \hat{v},
+\end{eqnarray*}
+where $\hat{\varepsilon},  \hat{e}, \hat{v}$ are the residuals. 
+Again, the last OLS fit means the OLS fit of each column of $X_2$ on $X_1$, and therefore the residual $\hat{v}$ is an $n\times L$ matrix.
+
+Show that $\hat{\gamma} = \hat{\beta}_1 +  \hat{\delta} \hat{\beta}_2$.
+
+\end{enumerate}
+
+
+\section{Simulation for RDD}
+
+\texttt{RDDnumericexamples.R} simulates potential outcomes from linear models. Change them to nonlinear models, and compare different point estimators and confidence intervals, including the biases and variances of the point estimators, and the coverage properties of confidence intervals.
+ 
+\section{Data analysis: \citet{sommer1991estimating}}
+
+
+Re-analyze the data in Table 23.1 of the Imbens--Rubin book. Note that $W_i^\text{obs}$ is the $D_i$ and $Y_i^\text{\obs}$ is the $Y_i$ in my lecture notes.
+
+
+\section{Data analysis: a flu shot encouragement design \citep{mcdonald1992effects}}
+For the details, you can read Chapter 25.2 of the Imbens--Rubin book. 
+Chapter 25 of the book uses a complicated model-based analysis. You can ignore it.
+
+
+In \texttt{fludata.txt}, the variables are the treatment assigned, treatment received, outcome, and pretreatment covariates. Analyze the data with and without using covariates. 
+
+\section{Data analysis: the Karolinska data}
+
+
+\citet{rubin2008objective} used the Karolinska data as an example for the instrumental variable method. In \texttt{karolinska.txt}, whether a patient was  diagnosed at large volume hospital can be viewed as an instrumental variable for whether a patient was treated at a large volume hospital. This is plausible at least conditioning on other observed covariates. See \citet{rubin2008objective}'s analysis for more details. 
+
+
+Reanalyze the data assuming that the instrumental variable is randomly assigned conditional on observed covariates. 
+
+
+
+\bibliographystyle{apalike}
+\bibliography{causal}
+
+\end{document}
+
+
+

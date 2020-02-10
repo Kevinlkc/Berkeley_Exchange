@@ -1,0 +1,661 @@
+---
+title: "Assignment4"
+author: "Kaicheng Luo"
+date: "2019/10/22"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(Matching)
+library(ATE)
+```
+
+```{r}
+# A DIY function of Matching Estimator
+# Some preparations: Distance Measure
+Edistance <- function(X, Y)
+{
+  if (length(X) != length(Y)){print("Error: Length Not Matched")}
+  else{return(sqrt(sum((X-Y)^2)))}
+}
+Mdistance <- function(X, Y, cov)
+{
+  if (length(X) != length(Y)){print("Error: Length Not Matched")}
+  else{return(t(X - Y) %*% solve(cov) %*% (X-Y))}
+}
+kNN <- function(x0, x, y, numberOfMatch = 1, dis = "Euclidean", COV = 0)
+{
+  # x0 shall be a vector and x shall be a matrix, y shall be the corresponding vector of responding x
+  # This function returns a numeric value if x0 is a number, and a vector if x0 is a vector
+  if (dis == "Euclidean")
+  {
+    rankDis = c()
+    for (i in 1:nrow(x))
+    {
+      rankDis = c(rankDis, Edistance(x0, x[i,]))
+    }
+    rankDis = rank(rankDis)
+    Y_hat = mean(y[which(rankDis<=numberOfMatch)])
+    X_hat = x[which(rankDis<=numberOfMatch),]
+    return(list("Y" = Y_hat, "X" = X_hat))
+  }
+  else if (dis == "M")
+  {
+    if (COV == 0){print("Error: covariance matrix not provided.")}
+    else{
+      rankDis = c()
+      for (i in 1:nrow(x))
+      {
+        rankDis = c(rankDis, Mdistance(x0, x[i,], COV))
+      }
+      rankDis = rank(rankDis)
+      Y_hat = mean(y[which(rankDis<=numberOfMatch)])
+      X_hat = x[which(rankDis<=numberOfMatch),]
+      return(list("Y" = Y_hat, "X" = X_hat))
+    }
+  }
+}
+MyMatching <- function(y, tr, x, numberOfMatch = 1, dis = "Euclidean", COV = 0)
+{
+  # First deal with the treatment group
+  Y1_treat = y[tr == 1]
+  Y0_treat = c()
+  for (i in 1:length(y[tr == 1]))
+  {
+    Y0_treat = c(Y0_treat, kNN(x[i,], x[tr == 0,], y[tr == 0], numberOfMatch, dis, COV)$Y)
+  }
+  # Then deal with the control group
+  Y0_control = y[tr == 0]
+  Y1_control = c()
+  for (i in 1:length(y[tr == 0]))
+  {
+    Y1_control = c(Y1_control, kNN(x[i,], x[tr == 1,], y[tr == 1], numberOfMatch, dis, COV)$Y)
+  }
+  # Calculate the test statistics (matching estimator and bias-corrected matching estimator)
+  tau_m = mean(c(Y1_treat, Y1_control) - c(Y0_treat, Y0_control))
+    # Fit two models for Y0 and Y1, respectively 
+  model0 <- lm(Y1_treat~x[tr == 1,])$coef
+  model1 <- lm(Y0_control~x[tr == 0,])$coef
+  bias = 0
+  for (i in 1:length(y[tr == 1]))
+  {
+    predx = c(1, x[i,]) %*% model0
+    prednn = cbind(1, kNN(x[i,], x[tr == 0,], y[tr == 0], numberOfMatch, dis)$X) %*% model0
+    bias = bias + mean(predx - prednn)
+  }
+  for (i in 1:length(y[tr == 0]))
+  {
+    predx = c(1, x[i,]) %*% model1
+    prednn = cbind(1, kNN(x[i,], x[tr == 1,], y[tr == 1], numberOfMatch, dis)$X) %*% model1
+    bias = bias + mean(prednn - predx)
+  }
+  bias = bias / length(y)
+  tau_mbc = tau_m - bias
+  return(list("tau_m" = tau_m, "tau_mbc" = tau_mbc))
+}
+```
+
+```{r}
+data("nhanes_bmi")
+z = nhanes_bmi$School_meal
+y = nhanes_bmi$BMI
+x = as.matrix(nhanes_bmi[, -c(1, 2)])
+pscore = glm(z ~ x, family = binomial)$fitted.values
+
+# Propensity Score Estimator
+stat_SRE <- function(stratum, treatment, y){
+  # Assume in our case that the stratum in arranged and indexed.
+  # If not, then re-code it to an index.
+  number = length(unique(stratum))
+  tau = 0
+  wil = 0
+  r = 0
+  # Calculate the three statistics as defined
+  for (i in 1:number){
+    tempy = y[stratum == i]
+    tempt = treatment[stratum == i]
+    n = length(tempy)
+    pi = n/length(y)
+    tau = tau + pi*(mean(tempy[tempt == 1] - mean(tempy[tempt == 0])))
+    wil = wil + wilcox.test(tempy[tempt == 1], tempy[tempt == 0])$statistic / (n+1)
+    tempy = tempy - mean(tempy)
+  }
+  y <- rank(y)
+  for (i in 1:length(y)){
+    if (treatment[i] == 1){
+      r = r + y[i]
+    }
+  }
+  return(c(taus = tau, wilcoxon = wil, alignedRank = r))
+}
+# Here we obtain the obs. values
+tau_pSRE = c()
+for (i in 1:7){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+ggplot()+
+  theme_bw() +
+  geom_point(aes(x = 1:7, y = tau_pSRE), color = 'maroon', size = 2) +
+  geom_line(aes(x = 1:7, y = tau_pSRE), color = 'maroon', size = 1)
+
+# Matching Estimator (Bias-Corrected)
+tau_mbc = c()
+se_tau = c()
+for (i in 1:20)
+{
+  model = Match(y, z, x, estimand = "ATE", M = i, BiasAdjust = T)
+  tau_mbc = c(tau_mbc, model$est)
+  se_tau = c(se_tau, model$se)
+}
+ggplot()+
+  theme_bw() +
+  geom_point(aes(x = 1:20, y = tau_mbc), color = 'maroon', size = 2) +
+  geom_line(aes(x = 1:20, y = tau_mbc), color = 'maroon', size = 1)
+```
+
+```{r}
+karolinska = read.table("karolinska.txt", header = TRUE)
+
+z = karolinska$HighVolDiagHosp
+y = 1 - (karolinska$YearsSurvivingAfterDiagnosis == 1)
+x = as.matrix(karolinska[, c(3, 4, 5)])
+
+pscore = glm(z ~ x, family = binomial)$fitted.values
+
+# Propensity Score Estimator
+stat_SRE <- function(stratum, treatment, y){
+  # Assume in our case that the stratum in arranged and indexed.
+  # If not, then re-code it to an index.
+  number = length(unique(stratum))
+  tau = 0
+  wil = 0
+  r = 0
+  # Calculate the three statistics as defined
+  for (i in 1:number){
+    tempy = y[stratum == i]
+    tempt = treatment[stratum == i]
+    n = length(tempy)
+    pi = n/length(y)
+    tau = tau + pi*(mean(tempy[tempt == 1] - mean(tempy[tempt == 0])))
+    tempy = tempy - mean(tempy)
+  }
+  y <- rank(y)
+  for (i in 1:length(y)){
+    if (treatment[i] == 1){
+      r = r + y[i]
+    }
+  }
+  return(c(taus = tau, alignedRank = r))
+}
+# Here we obtain the obs. values
+tau_pSRE = c()
+for (i in 1:4){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+ggplot()+
+  theme_bw() +
+  geom_point(aes(x = 1:4, y = tau_pSRE), color = 'maroon', size = 2) +
+  geom_line(aes(x = 1:4, y = tau_pSRE), color = 'maroon', size = 1)
+
+# Matching Estimator (Bias-Corrected)
+tau_mbc = c()
+se_tau = c()
+for (i in 1:20)
+{
+  model = Match(y, z, x, estimand = "ATE", M = i, BiasAdjust = T)
+  tau_mbc = c(tau_mbc, model$est)
+  se_tau = c(se_tau, model$se)
+}
+ggplot()+
+  theme_bw() +
+  geom_point(aes(x = 1:20, y = tau_mbc), color = 'maroon', size = 2) +
+  geom_line(aes(x = 1:20, y = tau_mbc), color = 'maroon', size = 1)
+```
+
+```{r}
+library("car")
+library("Matching")
+
+## experimental data
+lalonde = read.csv("cps1re74.csv", sep = " ")
+
+y = lalonde$re78
+z = lalonde$treat
+x = as.matrix(lalonde[, c("age", "educ", "black",
+                          "hispan", "married", "nodegree",
+                          "re74", "re75")])
+
+## analysis the randomized experiment via
+# Lin's Estimator
+xc = scale(x)
+linols = lm(y ~ z + xc + z*xc)
+tau_Lin = linols$coefficients[2]
+round(summary(linols)$coef[2, ], 4)
+sqrt(hccm(linols)[2, 2])
+
+# Regression Imputation Shall return the same results as Lin
+model1 = lm(y[z == 1]~x[z == 1,])
+model0 = lm(y[z == 0]~x[z == 0,])
+tau_reg = mean(cbind(1, x) %*% model1$coefficients - cbind(1, x) %*% model0$coefficients)
+tau_Lin - tau_reg
+
+# Propensity score stratification
+pscore = glm(z ~ x, family = binomial)$fitted.values
+tau_pSRE = c()
+for (i in 2:5){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+tau_pSRE
+
+# IPW estimator
+# With no truncation
+truncpscore = c(0,1)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_1 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_1 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# With certain truncation
+truncpscore = c(0.1,0.9)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_2 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_2 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# Doubly Robust Estimator
+outcome1 = glm(y ~ x, weights = z, family = gaussian)$fitted.values
+outcome0 = glm(y ~ x, weights = (1 - z), family = gaussian)$fitted.values
+res1 = y - outcome1
+res0 = y - outcome0
+tau_dr = mean(outcome1 - outcome0) + mean(z*res1/pscore - (1 - z)*res0/(1 - pscore))
+
+print(paste("Lin's estimator is ", tau_Lin, sep = ""))
+print(paste("Regression Imputation gives us an estimate same as Lin's ", tau_reg, sep = ""))
+print(paste("pscore stratification's estimator is ", tau_pSRE, sep = ""))
+print(paste("IPW estimator (hovic-thompson) without truncation is ",ipw_1, " and the hajek estimator is ",ipw_hajek_1 ,sep = ""))
+print(paste("IPW estimator (hovic-thompson) with truncation is ",ipw_2, " and the hajek estimator is ",ipw_hajek_2 ,sep = ""))
+print(paste("The doubly robust estimator is ", tau_dr))
+```
+
+```{r}
+# Propensity score stratification
+pscore = glm(z ~ x, family = binomial(link = "probit"))$fitted.values
+tau_pSRE = c()
+for (i in 2:5){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+
+# IPW estimator
+# With no truncation
+truncpscore = c(0,1)
+pscore = glm(z ~ x, family = binomial(link = "probit"))$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_1 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_1 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# With certain truncation
+truncpscore = c(0.1,0.9)
+pscore = glm(z ~ x, family = binomial(link = "probit"))$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_2 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_2 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# Doubly Robust Estimator
+outcome1 = glm(y ~ x, weights = z, family = gaussian)$fitted.values
+outcome0 = glm(y ~ x, weights = (1 - z), family = gaussian)$fitted.values
+res1 = y - outcome1
+res0 = y - outcome0
+tau_dr = mean(outcome1 - outcome0) + mean(z*res1/pscore - (1 - z)*res0/(1 - pscore))
+
+print("If we fit e(x) by probit model,")
+print(paste("Lin's estimator is ", tau_Lin, sep = ""))
+print(paste("Regression Imputation gives us an estimate same as Lin's ", tau_reg, sep = ""))
+print(paste("pscore stratification's estimator is ", tau_pSRE, sep = ""))
+print(paste("IPW estimator (hovic-thompson) without truncation is ",ipw_1, " and the hajek estimator is ",ipw_hajek_1 ,sep = ""))
+print(paste("IPW estimator (hovic-thompson) with truncation is ",ipw_2, " and the hajek estimator is ",ipw_hajek_2 ,sep = ""))
+print(paste("The doubly robust estimator is ", tau_dr))
+print("The doubly robust estimator is the one closest to the golden rule estimation.")
+```
+
+```{r}
+library(MatchIt)
+data <- read.csv("FDA-Carpenter.csv")
+# We perform similar data treatment 
+# The democrat is the senate is the treatment indicator, acttime is Y, and others are covariate.
+
+## rescaling
+data$hospdisc <- data$hospdisc/100000
+data$natreg <- data$natreg/100
+data$stafcder <- data$stafcder/100
+data$prevgenx <- data$prevgenx/100
+data$hhosleng <- data$hhosleng/10
+data$condavg3 <- data$condavg3/10
+data$orderent <- data$orderent/10
+data$vandavg3 <- data$vandavg3/10
+data$wpnoavg3 <- data$wpnoavg3/100
+
+z <- data$demsnmaj
+y <- data$acttime
+x <- as.matrix(data %>%
+  dplyr::select(-demsnmaj, -acttime))
+## analysis the randomized experiment via
+# Lin's Estimator
+xc = scale(x)
+linols = lm(y ~ z + xc + z*xc)
+tau_Lin = linols$coefficients[2]
+round(summary(linols)$coef[2, ], 4)
+sqrt(hccm(linols)[2, 2])
+
+# Regression Imputation Shall return the same results as Lin
+model1 = lm(y[z == 1]~x[z == 1,])
+model0 = lm(y[z == 0]~x[z == 0,])
+tau_reg = mean(cbind(1, x) %*% model1$coefficients - cbind(1, x) %*% model0$coefficients)
+
+# Propensity score stratification
+pscore = glm(z ~ x, family = binomial)$fitted.values
+tau_pSRE = c()
+for (i in 2:5){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+tau_pSRE
+
+# IPW estimator
+# With no truncation
+truncpscore = c(0,1)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_1 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_1 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# With certain truncation
+truncpscore = c(0.1,0.9)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_2 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_2 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# Doubly Robust Estimator
+outcome1 = glm(y ~ x, weights = z, family = gaussian)$fitted.values
+outcome0 = glm(y ~ x, weights = (1 - z), family = gaussian)$fitted.values
+res1 = y - outcome1
+res0 = y - outcome0
+tau_dr = mean(outcome1 - outcome0) + mean(z*res1/pscore - (1 - z)*res0/(1 - pscore))
+
+print(paste("Lin's estimator is ", tau_Lin, sep = ""))
+print(paste("Regression Imputation gives us an estimate same as Lin's ", tau_reg, sep = ""))
+print(paste("pscore stratification's estimator is ", tau_pSRE, sep = ""))
+print(paste("IPW estimator (hovic-thompson) without truncation is ",ipw_1, " and the hajek estimator is ",ipw_hajek_1 ,sep = ""))
+print(paste("IPW estimator (hovic-thompson) with truncation is ",ipw_2, " and the hajek estimator is ",ipw_hajek_2 ,sep = ""))
+print(paste("The doubly robust estimator is ", tau_dr))
+
+```
+
+```{r}
+data <- read.csv("Visibility-Koch.csv")
+data <- subset(data, subset=c(repman==1 & voter==1))
+data <- na.omit(data)
+
+y = data$prcanid
+z = 1 - data$rvisman
+x = data %>%
+  dplyr::select("repcan1", "goppty", "rideo", "rproj", "repft", "aware") %>%
+  as.matrix
+
+## analysis the randomized experiment via
+# Lin's Estimator
+xc = scale(x)
+linols = lm(y ~ z + xc + z*xc)
+tau_Lin = linols$coefficients[2]
+round(summary(linols)$coef[2, ], 4)
+sqrt(hccm(linols)[2, 2])
+
+# Regression Imputation Shall return the same results as Lin
+model1 = lm(y[z == 1]~x[z == 1,])
+model0 = lm(y[z == 0]~x[z == 0,])
+tau_reg = mean(cbind(1, x) %*% model1$coefficients - cbind(1, x) %*% model0$coefficients)
+
+# Propensity score stratification
+pscore = glm(z ~ x, family = binomial)$fitted.values
+tau_pSRE = c()
+for (i in 2:5){
+  stratum = floor(pscore*i) + 1
+  obsValue <- stat_SRE(stratum, z, y)
+  tau_pSRE = c(tau_pSRE, obsValue[1])
+}
+tau_pSRE
+
+# IPW estimator
+# With no truncation
+truncpscore = c(0,1)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_1 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_1 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# With certain truncation
+truncpscore = c(0.1,0.9)
+pscore = glm(z ~ x, family = binomial)$fitted.values
+pscore = pmax(truncpscore[1], pmin(truncpscore[2], pscore))
+ipw_2 = mean(z*y/pscore - (1 - z)*y/(1 - pscore))
+ipw_hajek_2 = mean(z*y/pscore)/mean(z/pscore) - mean((1 - z)*y/(1 - pscore))/mean((1 - z)/(1 - pscore))
+
+# Doubly Robust Estimator
+outcome1 = glm(y ~ x, weights = z, family = gaussian)$fitted.values
+outcome0 = glm(y ~ x, weights = (1 - z), family = gaussian)$fitted.values
+res1 = y - outcome1
+res0 = y - outcome0
+tau_dr = mean(outcome1 - outcome0) + mean(z*res1/pscore - (1 - z)*res0/(1 - pscore))
+
+print(paste("Lin's estimator is ", tau_Lin, sep = ""))
+print(paste("Regression Imputation gives us an estimate same as Lin's ", tau_reg, sep = ""))
+# Note that there could be Na values as stratums of pscores might not always include enough control and treatment observations
+print(paste("pscore stratification's estimator is ", tau_pSRE, sep = ""))
+print(paste("IPW estimator (hovic-thompson) without truncation is ",ipw_1, " and the hajek estimator is ",ipw_hajek_1 ,sep = ""))
+print(paste("IPW estimator (hovic-thompson) with truncation is ",ipw_2, " and the hajek estimator is ",ipw_hajek_2 ,sep = ""))
+print(paste("The doubly robust estimator is ", tau_dr))
+```
+
+```{r}
+ATT.est = function(z, y, x, out.family = gaussian, Utruncpscore = 1)
+{
+  ## sample size
+  nn  = length(z)
+  nn1 = sum(z)
+  
+  ## fitted propensity score
+  pscore   = glm(z ~ x, family = binomial)$fitted.values
+  pscore   = pmin(Utruncpscore, pscore)
+  odds.pscore = pscore/(1 - pscore)
+  
+  ## fitted potential outcomes
+  outcome0 = glm(y ~ x, weights = (1 - z), 
+                 family = out.family)$fitted.values
+  
+  ## regression imputation estimator
+  ace.reg0 = lm(y ~ z + x)$coef[2]
+  ace.reg  = mean(y[z==1]) - mean(outcome0[z==1]) 
+  ## propensity score weighting estimator
+  ace.ipw0 = mean(y[z==1]) - 
+                mean(odds.pscore*(1 - z)*y)*nn/nn1
+  ace.ipw  = mean(y[z==1]) - 
+                mean(odds.pscore*(1 - z)*y)/mean(odds.pscore*(1 - z))
+  ## doubly robust estimator
+  res0     = y - outcome0
+  ace.dr   = ace.reg - mean(odds.pscore*(1 - z)*res0)*nn/nn1
+  
+  return(c(ace.reg0, ace.reg, ace.ipw0, ace.ipw, ace.dr))     
+}
+
+
+ObsCausal.ATT = function(z, y, x, n.boot = 10^2,
+                         out.family = gaussian, Utruncpscore = 1)
+{
+  point.est  = ATT.est(z, y, x, out.family, Utruncpscore)
+  
+  ## nonparametric bootstrap
+  n.sample   = length(z)
+  x          = as.matrix(x)
+  boot.est   = replicate(n.boot, 
+                         {id.boot = sample(1:n.sample, n.sample, replace = TRUE)
+                          ATT.est(z[id.boot], y[id.boot], x[id.boot, ], 
+                                  out.family, Utruncpscore)})
+  
+  boot.se    = apply(boot.est, 1, sd)
+  
+  res        = rbind(point.est, boot.se)
+  rownames(res) = c("est", "se")
+  colnames(res) = c("reg0", "reg", "HT", "Hajek", "DR")
+  
+  return(res)
+}
+
+
+
+n.sim   = 2000
+ATT0    = rep(0, n.sim)
+ATT     = matrix(0, 5, n.sim)
+SEboot  = matrix(0, 5, n.sim)
+n       = 200
+
+## Baseline: simulation with correct models
+## nonparallel y1 and y0
+for(r in 1:n.sim)
+{
+  x       = matrix(rnorm(n*2), n, 2)
+  x1      = cbind(1, x)
+  beta.z  = c(0, 1, 1)
+  pscore  = 1/(1 + exp(- as.vector(x1%*%beta.z)))
+  z       = rbinom(n, 1, pscore)
+  beta.y1 = c(1, 2, 1)
+  beta.y0 = c(1, 1, 1)
+  y1      = rnorm(n, x1%*%beta.y1)
+  y0      = rnorm(n, x1%*%beta.y0)
+  y       = z*y1 + (1 - z)*y0
+  ATT0[r] = mean(y1[z==1]) - mean(y0[z==1])
+  
+  causaleffect = ObsCausal.ATT(z, y, x)
+  ATT[, r]     = causaleffect[1, ]
+  SEboot[, r]  = causaleffect[2, ]
+}
+
+apply(ATT, 1, mean) - mean(ATT0)
+apply(ATT, 1, sd)
+apply(SEboot, 1, mean)
+```
+
+```{r}
+## Case 1:
+## Wrong Model for y1 and y0 but correct model for propensity score
+for(r in 1:n.sim)
+{
+  x       = matrix(rnorm(n*2), n, 2)
+  x1      = cbind(1, x)
+  beta.z  = c(0, 1, 1)
+  pscore  = 1/(1 + exp(- as.vector(x1%*%beta.z)))
+  z       = rbinom(n, 1, pscore)
+  beta.y1 = c(1, 2, 1)
+  beta.y0 = c(1, 1, 1)
+  realbeta.y1 = c(2, 3, 4)
+  realbeta.y0 = c(100, 101, 102)
+  y1      = rnorm(n, x1%*%realbeta.y1)
+  y0      = rnorm(n, x1%*%realbeta.y0)
+  y       = z*y1 + (1 - z)*y0
+  ATT0[r] = mean(y1[z==1]) - mean(y0[z==1])
+  
+  causaleffect = ObsCausal.ATT(z, y, x)
+  ATT[, r]     = causaleffect[1, ]
+  SEboot[, r]  = causaleffect[2, ]
+}
+
+apply(ATT, 1, mean) - mean(ATT0)
+apply(ATT, 1, sd)
+apply(SEboot, 1, mean)
+```
+
+```{r}
+## Case 2:
+## Correct Model for y1 and y0 but wrong model for propensity score
+## Note that we're generating a uniform distribution of pscore. // z = rbinom(n, 1, pscore)
+for(r in 1:n.sim)
+{
+  x       = matrix(rnorm(n*2), n, 2)
+  x1      = cbind(1, x)
+  beta.z  = c(0, 1, 1)
+  pscore  = 1/(1 + exp(- as.vector(x1%*%beta.z)))
+  realpscore = 1/(1 + exp(-as.vector(x1 %*% c(0,0,0))))
+  z       = rbinom(n, 1, pscore)
+  beta.y1 = c(1, 2, 1)
+  beta.y0 = c(1, 1, 1)
+  y1      = rnorm(n, x1%*%beta.y1)
+  y0      = rnorm(n, x1%*%beta.y0)
+  y       = z*y1 + (1 - z)*y0
+  ATT0[r] = mean(y1[z==1]) - mean(y0[z==1])
+  
+  causaleffect = ObsCausal.ATT(z, y, x)
+  ATT[, r]     = causaleffect[1, ]
+  SEboot[, r]  = causaleffect[2, ]
+}
+
+apply(ATT, 1, mean) - mean(ATT0)
+ggplot() + theme_bw() +
+  geom_density(aes(x = ATT[1,] - mean(ATT0)), color = "maroon") + labs(x = "Regression Adjustment")
+ggplot() + theme_bw() +
+  geom_density(aes(x = ATT[2,] - mean(ATT0)), color = "maroon") + labs(x = "Lin's Estimator")
+ggplot() + theme_bw() +
+  geom_density(aes(x = ATT[3,] - mean(ATT0)), color = "maroon") + labs(x = "Hovik-Thompson")
+ggplot() + theme_bw() +
+  geom_density(aes(x = ATT[4,] - mean(ATT0)), color = "maroon") + labs(x = "Hajek Estimator")
+ggplot() + theme_bw() +
+  geom_density(aes(x = ATT[5,] - mean(ATT0)), color = "maroon") + labs(x = "Doubly Robust Estimator")
+
+apply(ATT, 1, sd)
+apply(SEboot, 1, mean)
+apply(ATT, 1, mean) - mean(ATT0) - 1.96*apply(ATT, 1, sd)
+```
+
+```{r}
+## Case 3:
+## Wrong model for both y0/ y1 and pscore
+for(r in 1:n.sim)
+{
+  x       = matrix(rnorm(n*2), n, 2)
+  x1      = cbind(1, x)
+  beta.z  = c(0, 1, 1)
+  pscore  = 1/(1 + exp(- as.vector(x1%*%beta.z)))
+  realpscore = 1/(1 + exp(-as.vector(x1 %*% c(0,0,0))))
+  z       = rbinom(n, 1, pscore)
+  beta.y1 = c(1, 2, 1)
+  beta.y0 = c(1, 1, 1)
+  realbeta.y1 = c(2, 3, 4)
+  realbeta.y0 = c(100, 101, 102)
+  y1      = rnorm(n, x1%*%realbeta.y1)
+  y0      = rnorm(n, x1%*%realbeta.y0)
+  y       = z*y1 + (1 - z)*y0
+  ATT0[r] = mean(y1[z==1]) - mean(y0[z==1])
+  
+  causaleffect = ObsCausal.ATT(z, y, x)
+  ATT[, r]     = causaleffect[1, ]
+  SEboot[, r]  = causaleffect[2, ]
+}
+
+apply(ATT, 1, mean) - mean(ATT0)
+apply(ATT, 1, sd)
+apply(SEboot, 1, mean)
+```
+

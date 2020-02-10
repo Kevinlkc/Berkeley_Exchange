@@ -1,0 +1,19 @@
+\begin{thebibliography}{}
+
+\bibitem[McDonald et~al., 1992]{mcdonald1992effects}
+McDonald, C., Hui, S.~L., and Tierney, W. (1992).
+\newblock Effects of computer reminders for influenza vaccination on morbidity
+  during influenza epidemics.
+\newblock {\em MD computing: computers in medical practice}, 9(5):304--312.
+
+\bibitem[Rubin, 2008]{rubin2008objective}
+Rubin, D.~B. (2008).
+\newblock For objective causal inference, design trumps analysis.
+\newblock {\em The Annals of Applied Statistics}, pages 808--840.
+
+\bibitem[Sommer and Zeger, 1991]{sommer1991estimating}
+Sommer, A. and Zeger, S.~L. (1991).
+\newblock On estimating efficacy from clinical trials.
+\newblock {\em Statistics in medicine}, 10(1):45--52.
+
+\end{thebibliography}

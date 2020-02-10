@@ -1,0 +1,8 @@
+"0","est = IV_Wald(Z, D, Y)"
+"0","estVar = IV_Wald_delta(Z, D, Y)"
+"0","print(paste(""The (Wald) point estimate of the treatment effect for logwage is "", est$CACE, "" and the confidence interval is ["", est$CACE - 1.96*estVar,"","",est$CACE + 1.96*estVar,""]"", sep = """"))"
+"1","[1]"
+"1"," ""The (Wald) point estimate of the treatment effect for logwage is 1.83417131676141 and the confidence interval is [0.435784069917934,3.23255856360489]"""
+"1","
+"
+"0","# That's significantly different from zero."

@@ -1,0 +1,93 @@
+---
+title: "hw1"
+author: "Kevin Luo"
+date: "2019/9/11"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(R.utils)
+library(foreign)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+```
+
+```{r}
+dat <- read.table("cps1re74.csv",header=T)
+# unemployed
+dat$u74 <- as.numeric(dat$re74==0)
+dat$u75 <- as.numeric(dat$re75==0)
+
+head(dat)
+dim(dat)
+
+## linear regression on the outcome
+lmoutcome = lm(re78 ~ ., data = dat)
+summary(lmoutcome)$coef
+
+lmoutcome$coefficients['treat']
+
+lmoutcome = lm(re78 ~ treat, data = dat)
+summary(lmoutcome)$coef
+```
+
+\section*{Problem 1}
+Run 1024 linear regressions with subsets of covariates, and report the regression coefficients of the treatment. How many are positively significant, how many are negatively significant, and how many are not significant?
+```{r}
+alpha <- 0.05
+positive <- 0
+negative <- 0
+
+# The main idea here is to use bit-operation to perform the loop.
+# For each variable j, the index we created in listI[[1]][j] determined whether it shall be included in our lm.
+for (i in 0:1023){
+  binaryI <- intToBin(i)
+  strI <- as.character(binaryI)
+  listI <- strsplit(strI, "")
+  modelSpecification <- "re78 ~ treat"
+  
+  # filter the dependent variable and treatment to ensure the 1-1 mapping between our index and the variable
+  ind_dat <- dat %>%
+    select(-'re78', -'treat')
+  
+  # The model specification is hence decided and updated according to the different values of i
+  for (j in 1:nchar(strI)){
+    if (listI[[1]][j] == "1"){
+      modelSpecification <- paste(modelSpecification, "+", colnames(ind_dat)[j])
+    }
+  }
+  lmtemp <- lm(modelSpecification, data = dat)
+  if (summary(lmtemp)$coefficients['treat','Pr(>|t|)'] < alpha & lmtemp$coefficients['treat'] > 0){
+    positive <- positive + 1
+  }
+  if (summary(lmtemp)$coefficients['treat','Pr(>|t|)'] < alpha & lmtemp$coefficients['treat'] < 0){
+    negative <- negative + 1
+  }
+}
+```
+
+There're 198 negative significant coeeficients of treatment and 125 positive ones. 
+
+\section*{Problem 2}
+Conduct two subgroup analyses:
+```{r}
+resume = read.csv("resume.csv")
+
+# Subsetting
+male_resume <- resume %>%
+  filter(sex == "male")
+female_resume <- resume %>%
+  filter(sex == "female")
+
+male_table = table(male_resume$race, male_resume$call)
+male_table
+fisher.test(male_table)
+female_table = table(female_resume$race, female_resume$call)
+female_table
+fisher.test(female_table)
+```
+
+
+
+
