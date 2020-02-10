@@ -1,0 +1,226 @@
+---
+title: "Assignment 8"
+author: "Kaicheng Luo"
+date: "2019/11/3"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE, message=F, warning=F}
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+data(iris)
+```
+
+```{r}
+data <- iris
+tss <- function(x){
+  return(sum((x - mean(x))^2))
+}
+tss(iris$Sepal.Length)
+```
+
+```{r}
+bss <- function(x, group){
+  if (length(x) != length(group)){
+    stop()
+  }
+  group = factor(group)
+  result = 0
+  m <- mean(x)
+  for (i in levels(group)){
+    subgroup <- x[group == i]
+    result = result + length(subgroup) * (mean(subgroup) - m)^2
+  }
+  return(result)
+}
+bss(iris$Sepal.Length, iris$Species)
+```
+
+```{r}
+wss <- function(x, group){
+  if (length(x) != length(group)){
+    stop()
+  }
+  group = factor(group)
+  result = 0
+  for (i in levels(group)){
+    subgroup <- x[group == i]
+    result = result + tss(subgroup)
+  }
+  return(result)
+}
+wss(iris$Sepal.Length, iris$Species)
+# Note that by decomposition, this shall return zero
+tss(iris$Sepal.Length) - wss(iris$Sepal.Length, iris$Species) - bss(iris$Sepal.Length, iris$Species)
+```
+
+```{r}
+cor_ratio <- function(x, group){
+  return(bss(x, group) / tss(x))
+}
+cor_ratio(iris$Sepal.Length, iris$Species)
+
+F_ratio <- function(x, group){
+  return(
+    bss(x, group) * (length(x) - length(levels(group))) / wss(x, group) * (length(levels(group)) - 1)
+  )
+}
+F_ratio(iris$Sepal.Length, iris$Species)
+```
+
+```{r}
+list("Slength" = cor_ratio(iris$Sepal.Length, iris$Species), "Swidth" = cor_ratio(iris$Sepal.Width, iris$Species), "Plength" = cor_ratio(iris$Petal.Length, iris$Species), "Pwidth" = cor_ratio(iris$Petal.Width, iris$Species))
+data.frame("Predictors" = c("Slength","Swidth","Plength","Pwidth"), "Cor" = c(cor_ratio(iris$Sepal.Length, iris$Species), cor_ratio(iris$Sepal.Width, iris$Species), cor_ratio(iris$Petal.Length, iris$Species), cor_ratio(iris$Petal.Width, iris$Species))) %>% arrange(by = Cor)
+
+data.frame("Predictors" = c("Slength","Swidth","Plength","Pwidth"), "Cor" = c(cor_ratio(iris$Sepal.Length, iris$Species), cor_ratio(iris$Sepal.Width, iris$Species), cor_ratio(iris$Petal.Length, iris$Species), cor_ratio(iris$Petal.Width, iris$Species))) %>% arrange(by = Cor) %>%
+  ggplot() + theme_bw() +
+    geom_bar(aes(x = Predictors, y = Cor), stat = "identity", width = .6)
+```
+
+```{r}
+list("Slength" = F_ratio(iris$Sepal.Length, iris$Species), "Swidth" = F_ratio(iris$Sepal.Width, iris$Species), "Plength" = F_ratio(iris$Petal.Length, iris$Species), "Pwidth" = F_ratio(iris$Petal.Width, iris$Species))
+data.frame("Predictors" = c("Slength","Swidth","Plength","Pwidth"), "F_ratio" = c(F_ratio(iris$Sepal.Length, iris$Species), F_ratio(iris$Sepal.Width, iris$Species), F_ratio(iris$Petal.Length, iris$Species), F_ratio(iris$Petal.Width, iris$Species))) %>% arrange(by = F_ratio)
+
+data.frame("Predictors" = c("Slength","Swidth","Plength","Pwidth"), "F_ratio" = c(F_ratio(iris$Sepal.Length, iris$Species), F_ratio(iris$Sepal.Width, iris$Species), F_ratio(iris$Petal.Length, iris$Species), F_ratio(iris$Petal.Width, iris$Species))) %>% arrange(by = F_ratio) %>%
+  ggplot() + theme_bw() +
+    geom_bar(aes(x = Predictors, y = F_ratio), stat = "identity", width = .6)
+```
+
+```{r}
+total_variance <- function(x){
+  X <- as.matrix(x - (matrix(1, nrow = nrow(x)) %*% t(apply(x, 2, mean))))
+  return(t(X) %*% X / (nrow(X)-1))
+}
+total_variance(iris[,1:4])
+# Compare with the built-in functions, they are identical!
+var(iris[,1:4])
+```
+
+```{r}
+between_variance <- function(x, group){
+  m <- apply(x, 2, mean)
+  group <- factor(group)
+  result = matrix(0, nrow = ncol(x), ncol = ncol(x))
+  for (i in levels(group)){
+    subgroup = x[group == i, ]
+    result = result + nrow(subgroup) / (nrow(x)-1) *(apply(subgroup, 2, mean) - m) %*% t(apply(subgroup, 2, mean) - m)
+  }
+  return(result)
+}
+between_variance(iris[,1:4], iris[,5])
+```
+
+```{r}
+within_variance <- function(x, group){
+  group <- factor(group)
+  result = matrix(0, nrow = ncol(x), ncol = ncol(x))
+  for (i in levels(group)){
+    subgroup = x[group == i,]
+    result = result + (nrow(subgroup)-1) * total_variance(subgroup) / (nrow(x) - 1)
+  }
+  return(result)
+}
+within_variance(iris[ ,1:4], iris[ ,5])
+
+# Here we can verify our decompostion formula
+round(total_variance(iris[,1:4]) - within_variance(iris[ ,1:4], iris[ ,5]) - between_variance(iris[,1:4], iris[,5]))
+```
+
+```{r}
+# confirm V = B + W
+Viris <- total_variance(iris[ ,1:4]) 
+Viris
+#B+W
+Biris <- between_variance(iris[ ,1:4], iris$Species) 
+Wiris <- within_variance(iris[ ,1:4], iris$Species) 
+Biris + Wiris
+```
+
+```{r}
+C <- function(x, group){
+  m <- apply(x, 2, mean)
+  group <- factor(group)
+  result = matrix(0, nrow = ncol(x), ncol = ncol(x))
+  for (j in 1:ncol(x)){
+    k = 0
+    for (i in levels(group)){
+      subgroup = x[group == i, ]
+      k = k+1
+      result[j,k] = sqrt(nrow(subgroup) / (nrow(x)-1)) * (mean(subgroup[,j]) - m[j])
+    }
+  }
+  return(result)
+}
+# Verify that the decompostion is correct
+round(C(iris[ ,1:4], iris$Species) %*% t(C(iris[ ,1:4], iris$Species)) -between_variance(iris[ ,1:4], iris$Species))
+C <- C(iris[ ,1:4], iris$Species)
+```
+
+```{r}
+result <- eigen(t(C) %*% solve(Wiris) %*% C)
+w <- result$vectors
+u <- solve(Wiris) %*%C %*% w
+z1 <- as.matrix(iris[,1:4]) %*% u[,1]
+z2 <- as.matrix(iris[,1:4]) %*% u[,2]
+plotdata <- data.frame("z1" = z1, "z2" = z2, group = iris$Species)
+ggplot() +
+  geom_point(aes(x = z1, y = z2, color = "setosa"), data = plotdata %>% filter(group == "setosa")) +
+  geom_point(aes(x = z1, y = z2, color = "versicolor"), data = plotdata %>% filter(group == "versicolor")) +
+  geom_point(aes(x = z1, y = z2, color = "virginica"), data = plotdata %>% filter(group == "virginica"))
+```
+
+```{r}
+result <- eigen(t(as.matrix(iris[,1:4])) %*% as.matrix(iris[1:4]))
+w <- result$vectors
+z1 <- as.matrix(iris[,1:4]) %*% w[,1]
+z2 <- as.matrix(iris[,1:4]) %*% w[,2]
+plotdata <- data.frame("z1" = z1, "z2" = z2, group = iris$Species)
+ggplot() +
+  geom_point(aes(x = z1, y = z2, color = "setosa"), data = plotdata %>% filter(group == "setosa")) +
+  geom_point(aes(x = z1, y = z2, color = "versicolor"), data = plotdata %>% filter(group == "versicolor")) +
+  geom_point(aes(x = z1, y = z2, color = "virginica"), data = plotdata %>% filter(group == "virginica"))
+```
+
+The princical component projection offers us the largest total variance, regardless of the information of the group of variables. There're still significant overlapping in the axis of the first principal component that leads to a somehow difficult task to classify objects. CDA, on the other hand, offers us the best "classification" projection, taking the information of group into consideration.
+
+```{r}
+distance <-  function(x, newx, Wiris){
+  return((x - newx) %*% solve(Wiris) %*% t(x-newx))
+}
+x <- iris[,1:4]
+group <- iris$Species
+Wiris <- within_variance(x, group)
+group <- factor(group)
+centroid <- matrix(0, nrow = ncol(x), ncol = length(levels(group)))
+k = 0
+for (i in levels(group)){
+  k = k+1
+  centroid[,k] = apply(x[group == i, ],2,mean)
+}
+x1 =c(5.0,3.0,1.5,0.5) 
+x2 =c(5.5,3.0,6.0,2.0) 
+x3 =c(6.0,3.0,4.0,1.0)
+x4 =c(5.0,3.0,1.0,0.5)
+```
+
+```{r}
+CDApred <- function(x, W = Wiris, centroid = centroid, group = iris$Species){
+  dis = c()
+  for (i in 1:length(levels(group))){
+    dis = c(dis, distance(centroid[,i], t(x), W))
+  }
+  if (which.min(dis) == 1){print(paste("It shall be classified into setosa. The Mdistance is ", dis[1]))}
+  if (which.min(dis) == 2){print(paste("It shall be classified into versicolor. The Mdistance is ", dis[2]))}
+  if (which.min(dis) == 3){print(paste("It shall be classified into virginica. The Mdistance is ", dis[3]))}
+}
+
+CDApred(x1, Wiris, centroid)
+CDApred(x2, Wiris, centroid)
+CDApred(x3, Wiris, centroid)
+CDApred(x4, Wiris, centroid)
+```
+

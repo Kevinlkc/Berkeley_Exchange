@@ -1,0 +1,606 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Lab 1},
+            pdfauthor={Kaicheng Luo},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Lab 1}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Kaicheng Luo}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2019/9/9}
+
+
+\begin{document}
+\maketitle
+
+Logistics: GSI: Ryan Theisen Office Hours: Wed 2-4pm Evans 444 email:
+theisen at berkeley.edu
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(knitr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'knitr' was built under R version 3.5.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pca <-}\StringTok{ }\KeywordTok{prcomp}\NormalTok{(USArrests, }\DataTypeTok{scale. =} \OtherTok{TRUE}\NormalTok{)}
+\KeywordTok{names}\NormalTok{(pca)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "sdev"     "rotation" "center"   "scale"    "x"
+\end{verbatim}
+
+\section*{Problem 1}
+
+PCA with EVD of correlation matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 1. Use scale() to standardize the USArrests data. Call this object arrests (matrix X)}
+\NormalTok{arrests <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(USArrests)}
+\CommentTok{# 2. Compute the sample correlation matrix R (don’t use cor()). Call this matrix R}
+\NormalTok{R <-}\StringTok{ }\KeywordTok{t}\NormalTok{(arrests) }\OperatorTok{%*%}\StringTok{ }\NormalTok{arrests }\OperatorTok{/}\StringTok{ }\NormalTok{(}\KeywordTok{nrow}\NormalTok{(arrests) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}
+\CommentTok{# 3. Use the function eigen() to compute the Eigenvalue Decomposition of R.}
+\NormalTok{eig <-}\StringTok{ }\KeywordTok{eigen}\NormalTok{(R)}
+\NormalTok{A <-}\StringTok{ }\KeywordTok{diag}\NormalTok{(eig}\OperatorTok{$}\NormalTok{values, }\DataTypeTok{nrow =} \DecValTok{4}\NormalTok{)}
+\NormalTok{V <-}\StringTok{ }\NormalTok{eig}\OperatorTok{$}\NormalTok{vectors}
+\CommentTok{# 4. Confirm that the matrix of loadings returned by prcomp() is equal to V}
+\NormalTok{pca}\OperatorTok{$}\NormalTok{rotation}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                 PC1        PC2        PC3         PC4
+## Murder   -0.5358995  0.4181809 -0.3412327  0.64922780
+## Assault  -0.5831836  0.1879856 -0.2681484 -0.74340748
+## UrbanPop -0.2781909 -0.8728062 -0.3780158  0.13387773
+## Rape     -0.5434321 -0.1673186  0.8177779  0.08902432
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{V}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.5358995  0.4181809 -0.3412327  0.64922780
+## [2,] -0.5831836  0.1879856 -0.2681484 -0.74340748
+## [3,] -0.2781909 -0.8728062 -0.3780158  0.13387773
+## [4,] -0.5434321 -0.1673186  0.8177779  0.08902432
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 5. Compute the product Z = XV and check that it’s equal to the principal components returned by prcomp(R)}
+\NormalTok{Z <-}\StringTok{ }\NormalTok{arrests }\OperatorTok{%*%}\StringTok{ }\NormalTok{V}
+\CommentTok{# This shall return a zero matrix}
+\NormalTok{Z }\OperatorTok{-}\StringTok{ }\NormalTok{pca}\OperatorTok{$}\NormalTok{x}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         [,1]          [,2]          [,3]          [,4]
+## Alabama        -6.661338e-16 -1.110223e-15 -1.110223e-16 -9.436896e-16
+## Alaska          4.440892e-16 -1.332268e-15  1.332268e-15  3.219647e-15
+## Arizona         1.776357e-15 -2.220446e-15  1.998401e-15  8.881784e-16
+## Arkansas       -1.054712e-15  2.220446e-16  2.220446e-16 -5.551115e-17
+## California      3.108624e-15 -2.886580e-15  1.332268e-15  1.665335e-15
+## Colorado        2.220446e-15 -1.554312e-15  2.220446e-16  2.192690e-15
+## Connecticut     0.000000e+00  1.110223e-15 -2.220446e-16 -8.049117e-16
+## Delaware        1.665335e-16 -2.775558e-16  1.443290e-15 -6.661338e-16
+## Florida         1.776357e-15 -3.330669e-15  1.110223e-15 -3.330669e-16
+## Georgia        -2.220446e-16 -1.554312e-15 -1.332268e-15 -6.661338e-16
+## Hawaii          8.881784e-16  6.661338e-16 -1.665335e-15  0.000000e+00
+## Idaho          -1.110223e-15  1.804112e-15  2.220446e-16  1.110223e-16
+## Illinois        1.110223e-15 -1.776357e-15  7.771561e-16 -6.522560e-16
+## Indiana        -2.220446e-16  5.828671e-16 -8.326673e-16  2.220446e-16
+## Iowa           -8.881784e-16  2.498002e-15 -8.881784e-16  8.326673e-17
+## Kansas         -2.220446e-16  8.326673e-16 -6.106227e-16 -1.110223e-16
+## Kentucky       -1.332268e-15  1.110223e-15 -1.387779e-15 -4.440892e-16
+## Louisiana       0.000000e+00 -1.665335e-15 -2.220446e-16 -1.221245e-15
+## Maine          -8.881784e-16  2.664535e-15 -2.220446e-16 -5.551115e-16
+## Maryland        4.440892e-16 -1.887379e-15  1.332268e-15 -1.110223e-16
+## Massachusetts   7.771561e-16  4.440892e-16  2.220446e-16 -5.828671e-16
+## Michigan        1.332268e-15 -2.359224e-15  4.440892e-16  9.436896e-16
+## Minnesota       0.000000e+00  1.776357e-15 -5.551115e-16  4.163336e-17
+## Mississippi    -1.887379e-15 -8.881784e-16 -2.220446e-16 -1.387779e-15
+## Missouri        6.661338e-16 -6.661338e-16 -1.110223e-16  7.216450e-16
+## Montana        -1.110223e-15  1.443290e-15 -4.440892e-16 -1.387779e-17
+## Nebraska       -4.440892e-16  1.360023e-15 -3.330669e-16  1.665335e-16
+## Nevada          2.220446e-15 -3.219647e-15  2.220446e-16  2.275957e-15
+## New Hampshire  -1.776357e-15  2.803313e-15 -6.661338e-16 -4.024558e-16
+## New Jersey      1.249001e-15 -6.661338e-16 -2.220446e-16 -8.604228e-16
+## New Mexico      1.110223e-15 -2.164935e-15  1.110223e-15  7.771561e-16
+## New York        1.776357e-15 -2.220446e-15  6.661338e-16 -5.828671e-16
+## North Carolina -1.776357e-15 -1.332268e-15  1.887379e-15 -1.554312e-15
+## North Dakota   -2.664535e-15  3.330669e-15 -4.440892e-16 -1.665335e-16
+## Ohio            4.996004e-16  0.000000e+00 -7.771561e-16 -5.551115e-17
+## Oklahoma        1.665335e-16  3.330669e-16 -1.249001e-16  6.938894e-18
+## Oregon          7.771561e-16 -1.110223e-16  3.330669e-16  1.665335e-15
+## Pennsylvania   -1.110223e-16  8.881784e-16 -8.326673e-16 -7.771561e-16
+## Rhode Island    6.661338e-16  4.440892e-16  8.881784e-16 -1.665335e-15
+## South Carolina -1.332268e-15 -1.332268e-15  5.551115e-16 -6.938894e-16
+## South Dakota   -1.554312e-15  2.442491e-15 -4.440892e-16  1.387779e-16
+## Tennessee      -2.220446e-16 -6.661338e-16 -7.771561e-16  1.110223e-16
+## Texas           1.110223e-15 -1.554312e-15 -6.661338e-16 -6.661338e-16
+## Utah            1.110223e-15  4.440892e-16 -1.110223e-16  6.661338e-16
+## Vermont        -2.220446e-15  3.552714e-15 -8.881784e-16  6.661338e-16
+## Virginia       -2.498002e-16  1.387779e-16 -3.538836e-16 -5.551115e-17
+## Washington      9.992007e-16 -1.110223e-16  2.220446e-16  1.137979e-15
+## West Virginia  -2.664535e-15  2.442491e-15 -8.881784e-16 -5.551115e-16
+## Wisconsin      -4.440892e-16  2.331468e-15 -8.881784e-16 -5.551115e-16
+## Wyoming        -6.661338e-16  6.661338e-16  1.110223e-16 -5.273559e-16
+\end{verbatim}
+
+\section*{Problem 2}
+
+PCA with SVD of the data matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 1. Use the function svd() to compute the Singular Value Decomposition of arrests.}
+\NormalTok{svd <-}\StringTok{ }\KeywordTok{svd}\NormalTok{(arrests)}
+\CommentTok{# 2. Take the output of svd() to create matrices U, D, V}
+\NormalTok{D <-}\StringTok{ }\KeywordTok{diag}\NormalTok{(svd}\OperatorTok{$}\NormalTok{d, }\DataTypeTok{nrow =} \KeywordTok{length}\NormalTok{(svd}\OperatorTok{$}\NormalTok{d))}
+\NormalTok{U <-}\StringTok{ }\NormalTok{svd}\OperatorTok{$}\NormalTok{u}
+\NormalTok{V <-}\StringTok{ }\NormalTok{svd}\OperatorTok{$}\NormalTok{v}
+\CommentTok{# 3. Compute the product Z = UD and check that it’s equal to the principal components returned by prcomp()}
+\NormalTok{Z <-}\StringTok{ }\NormalTok{U }\OperatorTok{%*%}\StringTok{ }\NormalTok{D}
+\KeywordTok{prcomp}\NormalTok{(arrests)}\OperatorTok{$}\NormalTok{x}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                        PC1         PC2         PC3          PC4
+## Alabama        -0.97566045  1.12200121 -0.43980366  0.154696581
+## Alaska         -1.93053788  1.06242692  2.01950027 -0.434175454
+## Arizona        -1.74544285 -0.73845954  0.05423025 -0.826264240
+## Arkansas        0.13999894  1.10854226  0.11342217 -0.180973554
+## California     -2.49861285 -1.52742672  0.59254100 -0.338559240
+## Colorado       -1.49934074 -0.97762966  1.08400162  0.001450164
+## Connecticut     1.34499236 -1.07798362 -0.63679250 -0.117278736
+## Delaware       -0.04722981 -0.32208890 -0.71141032 -0.873113315
+## Florida        -2.98275967  0.03883425 -0.57103206 -0.095317042
+## Georgia        -1.62280742  1.26608838 -0.33901818  1.065974459
+## Hawaii          0.90348448 -1.55467609  0.05027151  0.893733198
+## Idaho           1.62331903  0.20885253  0.25719021 -0.494087852
+## Illinois       -1.36505197 -0.67498834 -0.67068647 -0.120794916
+## Indiana         0.50038122 -0.15003926  0.22576277  0.420397595
+## Iowa            2.23099579 -0.10300828  0.16291036  0.017379470
+## Kansas          0.78887206 -0.26744941  0.02529648  0.204421034
+## Kentucky        0.74331256  0.94880748 -0.02808429  0.663817237
+## Louisiana      -1.54909076  0.86230011 -0.77560598  0.450157791
+## Maine           2.37274014  0.37260865 -0.06502225 -0.327138529
+## Maryland       -1.74564663  0.42335704 -0.15566968 -0.553450589
+## Massachusetts   0.48128007 -1.45967706 -0.60337172 -0.177793902
+## Michigan       -2.08725025 -0.15383500  0.38100046  0.101343128
+## Minnesota       1.67566951 -0.62590670  0.15153200  0.066640316
+## Mississippi    -0.98647919  2.36973712 -0.73336290  0.213342049
+## Missouri       -0.68978426 -0.26070794  0.37365033  0.223554811
+## Montana         1.17353751  0.53147851  0.24440796  0.122498555
+## Nebraska        1.25291625 -0.19200440  0.17380930  0.015733156
+## Nevada         -2.84550542 -0.76780502  1.15168793  0.311354436
+## New Hampshire   2.35995585 -0.01790055  0.03648498 -0.032804291
+## New Jersey     -0.17974128 -1.43493745 -0.75677041  0.240936580
+## New Mexico     -1.96012351  0.14141308  0.18184598 -0.336121113
+## New York       -1.66566662 -0.81491072 -0.63661186 -0.013348844
+## North Carolina -1.11208808  2.20561081 -0.85489245 -0.944789648
+## North Dakota    2.96215223  0.59309738  0.29824930 -0.251434626
+## Ohio            0.22369436 -0.73477837 -0.03082616  0.469152817
+## Oklahoma        0.30864928 -0.28496113 -0.01515592  0.010228476
+## Oregon         -0.05852787 -0.53596999  0.93038718 -0.235390872
+## Pennsylvania    0.87948680 -0.56536050 -0.39660218  0.355452378
+## Rhode Island    0.85509072 -1.47698328 -1.35617705 -0.607402746
+## South Carolina -1.30744986  1.91397297 -0.29751723 -0.130145378
+## South Dakota    1.96779669  0.81506822  0.38538073 -0.108470512
+## Tennessee      -0.98969377  0.85160534  0.18619262  0.646302674
+## Texas          -1.34151838 -0.40833518 -0.48712332  0.636731051
+## Utah            0.54503180 -1.45671524  0.29077592 -0.081486749
+## Vermont         2.77325613  1.38819435  0.83280797 -0.143433697
+## Virginia        0.09536670  0.19772785  0.01159482  0.209246429
+## Washington      0.21472339 -0.96037394  0.61859067 -0.218628161
+## West Virginia   2.08739306  1.41052627  0.10372163  0.130583080
+## Wisconsin       2.05881199 -0.60512507 -0.13746933  0.182253407
+## Wyoming         0.62310061  0.31778662 -0.23824049 -0.164976866
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Z}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##              [,1]        [,2]        [,3]         [,4]
+##  [1,] -0.97566045  1.12200121 -0.43980366  0.154696581
+##  [2,] -1.93053788  1.06242692  2.01950027 -0.434175454
+##  [3,] -1.74544285 -0.73845954  0.05423025 -0.826264240
+##  [4,]  0.13999894  1.10854226  0.11342217 -0.180973554
+##  [5,] -2.49861285 -1.52742672  0.59254100 -0.338559240
+##  [6,] -1.49934074 -0.97762966  1.08400162  0.001450164
+##  [7,]  1.34499236 -1.07798362 -0.63679250 -0.117278736
+##  [8,] -0.04722981 -0.32208890 -0.71141032 -0.873113315
+##  [9,] -2.98275967  0.03883425 -0.57103206 -0.095317042
+## [10,] -1.62280742  1.26608838 -0.33901818  1.065974459
+## [11,]  0.90348448 -1.55467609  0.05027151  0.893733198
+## [12,]  1.62331903  0.20885253  0.25719021 -0.494087852
+## [13,] -1.36505197 -0.67498834 -0.67068647 -0.120794916
+## [14,]  0.50038122 -0.15003926  0.22576277  0.420397595
+## [15,]  2.23099579 -0.10300828  0.16291036  0.017379470
+## [16,]  0.78887206 -0.26744941  0.02529648  0.204421034
+## [17,]  0.74331256  0.94880748 -0.02808429  0.663817237
+## [18,] -1.54909076  0.86230011 -0.77560598  0.450157791
+## [19,]  2.37274014  0.37260865 -0.06502225 -0.327138529
+## [20,] -1.74564663  0.42335704 -0.15566968 -0.553450589
+## [21,]  0.48128007 -1.45967706 -0.60337172 -0.177793902
+## [22,] -2.08725025 -0.15383500  0.38100046  0.101343128
+## [23,]  1.67566951 -0.62590670  0.15153200  0.066640316
+## [24,] -0.98647919  2.36973712 -0.73336290  0.213342049
+## [25,] -0.68978426 -0.26070794  0.37365033  0.223554811
+## [26,]  1.17353751  0.53147851  0.24440796  0.122498555
+## [27,]  1.25291625 -0.19200440  0.17380930  0.015733156
+## [28,] -2.84550542 -0.76780502  1.15168793  0.311354436
+## [29,]  2.35995585 -0.01790055  0.03648498 -0.032804291
+## [30,] -0.17974128 -1.43493745 -0.75677041  0.240936580
+## [31,] -1.96012351  0.14141308  0.18184598 -0.336121113
+## [32,] -1.66566662 -0.81491072 -0.63661186 -0.013348844
+## [33,] -1.11208808  2.20561081 -0.85489245 -0.944789648
+## [34,]  2.96215223  0.59309738  0.29824930 -0.251434626
+## [35,]  0.22369436 -0.73477837 -0.03082616  0.469152817
+## [36,]  0.30864928 -0.28496113 -0.01515592  0.010228476
+## [37,] -0.05852787 -0.53596999  0.93038718 -0.235390872
+## [38,]  0.87948680 -0.56536050 -0.39660218  0.355452378
+## [39,]  0.85509072 -1.47698328 -1.35617705 -0.607402746
+## [40,] -1.30744986  1.91397297 -0.29751723 -0.130145378
+## [41,]  1.96779669  0.81506822  0.38538073 -0.108470512
+## [42,] -0.98969377  0.85160534  0.18619262  0.646302674
+## [43,] -1.34151838 -0.40833518 -0.48712332  0.636731051
+## [44,]  0.54503180 -1.45671524  0.29077592 -0.081486749
+## [45,]  2.77325613  1.38819435  0.83280797 -0.143433697
+## [46,]  0.09536670  0.19772785  0.01159482  0.209246429
+## [47,]  0.21472339 -0.96037394  0.61859067 -0.218628161
+## [48,]  2.08739306  1.41052627  0.10372163  0.130583080
+## [49,]  2.05881199 -0.60512507 -0.13746933  0.182253407
+## [50,]  0.62310061  0.31778662 -0.23824049 -0.164976866
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 4. Confirm that the matrix of loadings returned by prcomp() is equal to V}
+\KeywordTok{prcomp}\NormalTok{(arrests)}\OperatorTok{$}\NormalTok{rotation}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                 PC1        PC2        PC3         PC4
+## Murder   -0.5358995  0.4181809 -0.3412327  0.64922780
+## Assault  -0.5831836  0.1879856 -0.2681484 -0.74340748
+## UrbanPop -0.2781909 -0.8728062 -0.3780158  0.13387773
+## Rape     -0.5434321 -0.1673186  0.8177779  0.08902432
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{V}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.5358995  0.4181809 -0.3412327  0.64922780
+## [2,] -0.5831836  0.1879856 -0.2681484 -0.74340748
+## [3,] -0.2781909 -0.8728062 -0.3780158  0.13387773
+## [4,] -0.5434321 -0.1673186  0.8177779  0.08902432
+\end{verbatim}
+
+\section*{Problem 3}
+
+PCA with EVD of association matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{asso <-}\StringTok{ }\NormalTok{arrests }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(arrests)}
+\CommentTok{# Calculate the Eigen-Decomposotion of the Assosiation Matrix}
+\NormalTok{eig2 <-}\StringTok{ }\KeywordTok{eigen}\NormalTok{(asso)}
+\NormalTok{A1 <-}\StringTok{ }\KeywordTok{diag}\NormalTok{(eig2}\OperatorTok{$}\NormalTok{values, }\DataTypeTok{nrow =} \KeywordTok{length}\NormalTok{(eig2}\OperatorTok{$}\NormalTok{values))}
+\NormalTok{B <-}\StringTok{ }\NormalTok{eig2}\OperatorTok{$}\NormalTok{vectors}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(A1))\{}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(A1))\{}
+\NormalTok{    A1[i,j] <-}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(A1[i,j])}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+
+## Warning in sqrt(A1[i, j]): 产生了NaNs
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(B }\OperatorTok{%*%}\StringTok{ }\NormalTok{A1)[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##              [,1]        [,2]        [,3]         [,4]
+##  [1,] -0.97566045  1.12200121  0.43980366 -0.154696581
+##  [2,] -1.93053788  1.06242692 -2.01950027  0.434175454
+##  [3,] -1.74544285 -0.73845954 -0.05423025  0.826264240
+##  [4,]  0.13999894  1.10854226 -0.11342217  0.180973554
+##  [5,] -2.49861285 -1.52742672 -0.59254100  0.338559240
+##  [6,] -1.49934074 -0.97762966 -1.08400162 -0.001450164
+##  [7,]  1.34499236 -1.07798362  0.63679250  0.117278736
+##  [8,] -0.04722981 -0.32208890  0.71141032  0.873113315
+##  [9,] -2.98275967  0.03883425  0.57103206  0.095317042
+## [10,] -1.62280742  1.26608838  0.33901818 -1.065974459
+## [11,]  0.90348448 -1.55467609 -0.05027151 -0.893733198
+## [12,]  1.62331903  0.20885253 -0.25719021  0.494087852
+## [13,] -1.36505197 -0.67498834  0.67068647  0.120794916
+## [14,]  0.50038122 -0.15003926 -0.22576277 -0.420397595
+## [15,]  2.23099579 -0.10300828 -0.16291036 -0.017379470
+## [16,]  0.78887206 -0.26744941 -0.02529648 -0.204421034
+## [17,]  0.74331256  0.94880748  0.02808429 -0.663817237
+## [18,] -1.54909076  0.86230011  0.77560598 -0.450157791
+## [19,]  2.37274014  0.37260865  0.06502225  0.327138529
+## [20,] -1.74564663  0.42335704  0.15566968  0.553450589
+## [21,]  0.48128007 -1.45967706  0.60337172  0.177793902
+## [22,] -2.08725025 -0.15383500 -0.38100046 -0.101343128
+## [23,]  1.67566951 -0.62590670 -0.15153200 -0.066640316
+## [24,] -0.98647919  2.36973712  0.73336290 -0.213342049
+## [25,] -0.68978426 -0.26070794 -0.37365033 -0.223554811
+## [26,]  1.17353751  0.53147851 -0.24440796 -0.122498555
+## [27,]  1.25291625 -0.19200440 -0.17380930 -0.015733156
+## [28,] -2.84550542 -0.76780502 -1.15168793 -0.311354436
+## [29,]  2.35995585 -0.01790055 -0.03648498  0.032804291
+## [30,] -0.17974128 -1.43493745  0.75677041 -0.240936580
+## [31,] -1.96012351  0.14141308 -0.18184598  0.336121113
+## [32,] -1.66566662 -0.81491072  0.63661186  0.013348844
+## [33,] -1.11208808  2.20561081  0.85489245  0.944789648
+## [34,]  2.96215223  0.59309738 -0.29824930  0.251434626
+## [35,]  0.22369436 -0.73477837  0.03082616 -0.469152817
+## [36,]  0.30864928 -0.28496113  0.01515592 -0.010228476
+## [37,] -0.05852787 -0.53596999 -0.93038718  0.235390872
+## [38,]  0.87948680 -0.56536050  0.39660218 -0.355452378
+## [39,]  0.85509072 -1.47698328  1.35617705  0.607402746
+## [40,] -1.30744986  1.91397297  0.29751723  0.130145378
+## [41,]  1.96779669  0.81506822 -0.38538073  0.108470512
+## [42,] -0.98969377  0.85160534 -0.18619262 -0.646302674
+## [43,] -1.34151838 -0.40833518  0.48712332 -0.636731051
+## [44,]  0.54503180 -1.45671524 -0.29077592  0.081486749
+## [45,]  2.77325613  1.38819435 -0.83280797  0.143433697
+## [46,]  0.09536670  0.19772785 -0.01159482 -0.209246429
+## [47,]  0.21472339 -0.96037394 -0.61859067  0.218628161
+## [48,]  2.08739306  1.41052627 -0.10372163 -0.130583080
+## [49,]  2.05881199 -0.60512507  0.13746933 -0.182253407
+## [50,]  0.62310061  0.31778662  0.23824049  0.164976866
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pca}\OperatorTok{$}\NormalTok{x}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                        PC1         PC2         PC3          PC4
+## Alabama        -0.97566045  1.12200121 -0.43980366  0.154696581
+## Alaska         -1.93053788  1.06242692  2.01950027 -0.434175454
+## Arizona        -1.74544285 -0.73845954  0.05423025 -0.826264240
+## Arkansas        0.13999894  1.10854226  0.11342217 -0.180973554
+## California     -2.49861285 -1.52742672  0.59254100 -0.338559240
+## Colorado       -1.49934074 -0.97762966  1.08400162  0.001450164
+## Connecticut     1.34499236 -1.07798362 -0.63679250 -0.117278736
+## Delaware       -0.04722981 -0.32208890 -0.71141032 -0.873113315
+## Florida        -2.98275967  0.03883425 -0.57103206 -0.095317042
+## Georgia        -1.62280742  1.26608838 -0.33901818  1.065974459
+## Hawaii          0.90348448 -1.55467609  0.05027151  0.893733198
+## Idaho           1.62331903  0.20885253  0.25719021 -0.494087852
+## Illinois       -1.36505197 -0.67498834 -0.67068647 -0.120794916
+## Indiana         0.50038122 -0.15003926  0.22576277  0.420397595
+## Iowa            2.23099579 -0.10300828  0.16291036  0.017379470
+## Kansas          0.78887206 -0.26744941  0.02529648  0.204421034
+## Kentucky        0.74331256  0.94880748 -0.02808429  0.663817237
+## Louisiana      -1.54909076  0.86230011 -0.77560598  0.450157791
+## Maine           2.37274014  0.37260865 -0.06502225 -0.327138529
+## Maryland       -1.74564663  0.42335704 -0.15566968 -0.553450589
+## Massachusetts   0.48128007 -1.45967706 -0.60337172 -0.177793902
+## Michigan       -2.08725025 -0.15383500  0.38100046  0.101343128
+## Minnesota       1.67566951 -0.62590670  0.15153200  0.066640316
+## Mississippi    -0.98647919  2.36973712 -0.73336290  0.213342049
+## Missouri       -0.68978426 -0.26070794  0.37365033  0.223554811
+## Montana         1.17353751  0.53147851  0.24440796  0.122498555
+## Nebraska        1.25291625 -0.19200440  0.17380930  0.015733156
+## Nevada         -2.84550542 -0.76780502  1.15168793  0.311354436
+## New Hampshire   2.35995585 -0.01790055  0.03648498 -0.032804291
+## New Jersey     -0.17974128 -1.43493745 -0.75677041  0.240936580
+## New Mexico     -1.96012351  0.14141308  0.18184598 -0.336121113
+## New York       -1.66566662 -0.81491072 -0.63661186 -0.013348844
+## North Carolina -1.11208808  2.20561081 -0.85489245 -0.944789648
+## North Dakota    2.96215223  0.59309738  0.29824930 -0.251434626
+## Ohio            0.22369436 -0.73477837 -0.03082616  0.469152817
+## Oklahoma        0.30864928 -0.28496113 -0.01515592  0.010228476
+## Oregon         -0.05852787 -0.53596999  0.93038718 -0.235390872
+## Pennsylvania    0.87948680 -0.56536050 -0.39660218  0.355452378
+## Rhode Island    0.85509072 -1.47698328 -1.35617705 -0.607402746
+## South Carolina -1.30744986  1.91397297 -0.29751723 -0.130145378
+## South Dakota    1.96779669  0.81506822  0.38538073 -0.108470512
+## Tennessee      -0.98969377  0.85160534  0.18619262  0.646302674
+## Texas          -1.34151838 -0.40833518 -0.48712332  0.636731051
+## Utah            0.54503180 -1.45671524  0.29077592 -0.081486749
+## Vermont         2.77325613  1.38819435  0.83280797 -0.143433697
+## Virginia        0.09536670  0.19772785  0.01159482  0.209246429
+## Washington      0.21472339 -0.96037394  0.61859067 -0.218628161
+## West Virginia   2.08739306  1.41052627  0.10372163  0.130583080
+## Wisconsin       2.05881199 -0.60512507 -0.13746933  0.182253407
+## Wyoming         0.62310061  0.31778662 -0.23824049 -0.164976866
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Note that they're only different in terms of signs}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

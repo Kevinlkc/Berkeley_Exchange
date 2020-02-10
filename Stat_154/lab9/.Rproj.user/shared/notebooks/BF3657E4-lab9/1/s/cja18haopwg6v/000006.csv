@@ -1,0 +1,6 @@
+"0","set.seed(1000)"
+"0","result <- my_kmeans(iris[,1:4], 3)$clustering_vector"
+"0","ggplot() + theme_bw() +"
+"0","  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = ""Group 1"")) +"
+"0","  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = ""Group 2"")) +"
+"0","  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = ""Group 3""))"

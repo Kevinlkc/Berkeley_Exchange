@@ -1,0 +1,330 @@
+---
+title: "Assignment 2"
+author: "Kaicheng Luo"
+date: "2019/10/1"
+output:
+  pdf_document:
+    keep_tex: yes
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(foreign)
+library(readxl)
+```
+
+\section*{Problem 2}
+\subsubsection*{Playing with a toy model of SRE}
+```{r}
+# FRT for the Project STAR data in the Imbens–Rubin book
+# Note that here we collect the image manually
+data <- read_excel("STAR.xlsx")
+
+# Preparations
+# Step 1: Write a function that gives you all the statistics you want in SRE
+stat_SRE <- function(stratum, treatment, y){
+  # Assume in our case that the stratum in arranged and indexed.
+  # If not, then re-code it to an index.
+  number = length(unique(stratum))
+  tau = 0
+  wil = 0
+  r = 0
+  # Calculate the three statistics as defined
+  for (i in 1:number){
+    tempy = y[stratum == i]
+    tempt = treatment[stratum == i]
+    n = length(tempy)
+    pi = n/length(y)
+    tau = tau + pi*(mean(tempy[tempt == 1] - mean(tempy[tempt == 0])))
+    wil = wil + wilcox.test(tempy[tempt == 1], tempy[tempt == 0])$statistic / (n+1)
+    tempy = tempy - mean(tempy)
+  }
+  y <- rank(y)
+  for (i in 1:length(y)){
+    if (treatment[i] == 1){
+      r = r + y[i]
+    }
+  }
+  return(c(taus = tau, wilcoxon = wil, alignedRank = r))
+}
+# Then we can calculate the observed value
+obsValue <- stat_SRE(data$Stratum, data$Treatment, data$Y)
+obsValue
+```
+
+```{r}
+# Step 2: Write a function that permutes your data in strata
+permute <- function(stratum, treatment){
+  ptreat <- vector()
+  for (i in 1:length(unique(stratum))){
+    ptreat <- c(ptreat, sample(treatment[stratum == i]))
+  }
+  return(ptreat)
+}
+```
+
+```{r}
+# Step 3: Carry out Stratified Randomization Test
+MC = 2000
+extreme = rep(0,3)
+for (i in 1:MC){
+  mcStat = stat_SRE(data$Stratum, permute(data$Stratum, data$Treatment), data$Y)
+  for (j in 1:3){
+    if (abs(mcStat[j]) > abs(obsValue[j])){
+      extreme[j] = extreme[j] + 1
+    }
+  }
+}
+# Tidy display of our result
+display <- data.frame("Taus" = extreme[1]/MC, "V" = extreme[2]/MC, "Aligned Rank" = extreme[3]/MC)
+display
+# At 95% significance level, we rejeect the sharp null hypothesis that there's no significant difference between outcomes within strata.
+```
+
+\section*{Problem 3}
+```{r, message=FALSE, warning=FALSE}
+# Baseline Model with NO Strata
+# Compare it with the normal complete randomized experiment
+# Part 1: FRT
+# Step 4: Compare our results with the CRE
+library(Matching)
+data("lalonde")
+z <- lalonde$treat
+y <- lalonde$re78
+
+# Monte-Carlo Simulation of data
+MC = 2000
+Tauhat   = rep(0, MC)
+Student  = rep(0, MC)
+Wilcox   = rep(0, MC)
+Ks       = rep(0, MC)
+tau = t.test(y ~ z, var.equal = TRUE)$statistic
+t = t.test(y ~ z, var.equal = FALSE)$statistic
+w = wilcox.test(y ~ z)$statistic 
+ks = ks.test(y[z == 1], y[z == 0])$statistic
+
+extreme_tau = 0
+extreme_t = 0
+extreme_w = 0
+extreme_ks = 0
+for(mc in 1:MC){
+   zperm = sample(z)
+   temptau = t.test(y ~ zperm, var.equal = TRUE)$statistic 
+   tempt = t.test(y ~ zperm, var.equal = FALSE)$statistic
+   tempw = wilcox.test(y ~ zperm)$statistic 
+   tempks = ks.test(y[zperm == 1], y[zperm == 0])$statistic
+   if (abs(temptau) > abs(tau)){
+     extreme_tau <- extreme_tau + 1
+   }
+   if (abs(tempt) > abs(t)){
+     extreme_t <- extreme_t + 1
+   }
+   if (abs(tempw) < abs(w)){
+     extreme_w <- extreme_w + 1
+   }
+   if (abs(tempks) > abs(ks)){
+     extreme_ks <- extreme_ks + 1
+   }
+}
+# Tidy display of our result
+display_CRE <- data.frame("Tau" = extreme_tau/MC, "t" = extreme_t/MC, "Wilcoxon" = extreme_w/MC, "KS" = extreme_ks / MC)
+display_CRE
+```
+
+
+```{r}
+# Part 2: Neymanian Inference
+library(Matching)
+data(lalonde)
+head(lalonde)
+
+z = lalonde$treat
+y = lalonde$re78
+
+## Neymanian inference
+n1= sum(z)
+n0= length(z) - n1
+tauhat = mean(y[z==1]) - mean(y[z==0])
+vhat   = var(y[z==1])/n1 + var(y[z==0])/n0
+sehat  = sqrt(vhat)
+tauhat
+sehat
+```
+
+```{r, message=FALSE}
+# Step 0: Some data-cleaning presumed here as I'm implementing my own function of SRE
+library(Matching)
+data(lalonde)
+data <- lalonde
+data <- data %>%
+  mutate(race = ifelse(black==1, 1, 0)) %>%
+  mutate(race = ifelse(hisp == 1, 2, race))
+data <- data[,c(-3,-4)]
+data$race <- data$race + 1
+data <- data %>%
+  arrange(by = race)
+```
+
+```{r, warning=FALSE}
+# Step 1: Pretend that the SRE is done by blocking race
+# Part 1: Fisher Randomization test
+MC = 2000
+extreme = rep(0,3)
+obsValue <- stat_SRE(data$race, data$treat, data$re78)
+obsValue
+for (i in 1:MC){
+  mcStat = stat_SRE(data$race, permute(data$race, data$treat), data$re78)
+  for (j in 1:3){
+    if (abs(mcStat[j]) > abs(obsValue[j])){
+      extreme[j] = extreme[j] + 1
+    }
+  }
+}
+# Tidy display of our result
+display1 <- data.frame("Taus" = extreme[1]/MC, "V" = extreme[2]/MC, "Aligned Rank" = extreme[3]/MC)
+display1
+```
+
+```{r}
+# Step 1: Pretend that the SRE is done by blocking race
+# Part 2: Neymanian Inference
+print(c ("The point estimator is", obsValue[1]))
+
+var_neyman <- function(stratum, treatment, y){
+  V = 0
+  for(i in 1:length(unique(stratum))){
+    tempy = y[stratum == i]
+    tempt = treatment[stratum == i]
+    n = length(tempy)
+    y0 = tempy[tempt == 0]
+    y1 = tempy[tempt == 1]
+    V = V + (length(y0)/n)^2 * (sd(y0)/length(y0) + sd(y1)/length(y1))
+  }
+  return(V)
+}
+SRE_race <- var_neyman(data$race, data$treat, data$re78)
+SRE_race
+```
+
+```{r, warning=FALSE}
+# Step 2: Pretend that the SRE is done by blocking marital status
+# Part 1: FRT
+data$married <- data$married + 1
+data <- data %>% arrange(by=married)
+MC = 2000
+extreme = rep(0,3)
+obsValue <- stat_SRE(data$married, data$treat, data$re78)
+obsValue
+for (i in 1:MC){
+  mcStat = stat_SRE(data$married, permute(data$married, data$treat), data$re78)
+  for (j in 1:3){
+    if (abs(mcStat[j]) > abs(obsValue[j])){
+      extreme[j] = extreme[j] + 1
+    }
+  }
+}
+# Tidy display of our result
+display2 <- data.frame("Taus" = extreme[1]/MC, "V" = extreme[2]/MC, "Aligned Rank" = extreme[3]/MC)
+display2
+```
+
+```{r}
+# Step 2: Pretend that the SRE is done by blocking marital status
+# Part 2: Neymanian Inference
+SRE_marriage <- var_neyman(data$married, data$treat, data$re78)
+SRE_marriage
+```
+
+
+```{r, warning=FALSE}
+# Step 3: Pretend that the SRE is done by blocking nodegr
+# Part 1: FRT
+data$nodegr = data$nodegr + 1
+data <- data %>% arrange(by = nodegr)
+MC = 2000
+extreme = rep(0,3)
+obsValue <- stat_SRE(data$nodegr, data$treat, data$re78)
+obsValue
+for (i in 1:MC){
+  mcStat = stat_SRE(data$nodegr, permute(data$nodegr, data$treat), data$re78)
+  for (j in 1:3){
+    if (abs(mcStat[j]) > abs(obsValue[j])){
+      extreme[j] = extreme[j] + 1
+    }
+  }
+}
+# Tidy display of our result
+display3 <- data.frame("Taus" = extreme[1]/MC, "V" = extreme[2]/MC, "Aligned Rank" = extreme[3]/MC)
+display3
+```
+
+```{r}
+# Step 3: Pretend that the SRE is done by blocking nodegr
+# Part 2: Neymanian Inference
+SRE_edu <- var_neyman(data$nodegr, data$treat, data$re78)
+SRE_edu
+```
+
+\subsubsection*{3.2 Regression adjusments for Penn}
+```{r}
+penndata = read.table("Penn46_ascii.txt")
+head(penndata)
+z = penndata$treatment
+penndata$duration = log(penndata$duration)
+y = lm(duration ~ .-treatment, data = penndata)$residuals
+penndata <- penndata %>%
+  mutate(quarter = quarter + 1) %>%
+  arrange(by = quarter)
+obsValue = stat_SRE(penndata$quarter, penndata$treatment, y)
+# The point estimator
+obsValue[1]
+SRE_adjusted <- var_neyman(penndata$quarter, penndata$treatment, y)
+SRE_adjusted
+# Interval estimation
+print(paste("[",obsValue[1] - SRE_adjusted*1.96,",",obsValue[1] + SRE_adjusted*1.96,"]"), sep = "")
+```
+
+```{r}
+Neyman_SRE = function(z, y, x)
+{
+       xlevels = unique(x)
+       K       = length(xlevels)
+       PiK     = rep(0, K)
+       TauK    = rep(0, K)
+       varK    = rep(0, K)
+       for(k in 1:K)
+       {
+             xk         = xlevels[k]
+             zk         = z[x == xk]
+             yk         = y[x == xk]
+             PiK[k]     = length(zk)/length(z)
+             TauK[k]    = mean(yk[zk==1]) - mean(yk[zk==0])
+             varK[k]    = var(yk[zk==1])/sum(zk) + 
+                               var(yk[zk==0])/sum(1 - zk)
+       }
+       
+       return(c(sum(PiK*TauK), sum(PiK^2*varK)))
+}
+
+## pennsylvania re-employment bonus experiment
+## description of the DATA: 
+## Koenker and Xiao 2002 Econometrica 
+## "Inference on the Quantile Regression Process" 
+
+penndata = read.table("Penn46_ascii.txt")
+head(penndata)
+
+z = penndata$treatment
+y = log(penndata$duration)
+block = penndata$quarter
+est = Neyman_SRE(z, y, block)
+est[1]
+sqrt(est[2])
+print(paste("[",est[1]-1.96*sqrt(est[2]),",",est[1]+sqrt(est[2]),"]"))
+```
+

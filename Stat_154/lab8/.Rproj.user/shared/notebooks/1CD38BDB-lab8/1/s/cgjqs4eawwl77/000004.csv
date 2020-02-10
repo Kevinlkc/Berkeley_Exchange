@@ -1,0 +1,5 @@
+"0","data(""Default"")"
+"0","yes <- Default %>%"
+"0","  filter(default == 'Yes')"
+"0","no <- Default %>%"
+"0","  filter(default == 'No')"

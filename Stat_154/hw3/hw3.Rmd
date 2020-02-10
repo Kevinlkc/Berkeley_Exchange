@@ -1,0 +1,55 @@
+---
+title: "Hw3"
+author: "Kevin Luo"
+date: "2019/9/22"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+
+```
+
+```{r, warning=FALSE}
+A1 <- diag(c(1,2,2), nrow = 3)
+A2 <- diag(c(1,2,0), nrow = 3)
+b <- matrix(c(1,1,0), ncol = 1)
+epsilon <- c(1e-8,1e-8,1e-8)
+lambda <- 0.1
+converge <- function(X, lastX){
+  for (i in 1:length(X)){
+    if (abs(X[i]-lastX[i])>epsilon){
+      return(FALSE)
+    }
+  }
+  return(TRUE)
+}
+for (i in 1:5){
+  X = rnorm(3)
+  lastX <- X+1
+  while (converge(X, lastX) == FALSE){
+    lastX = X
+    X = X - lambda*(A1 %*% X - b)
+  }
+  print(X)
+}
+# Compare the results to $x* = A1^{-1}b$
+solve(A1) %*%b
+# They converged to the same x*
+```
+
+But that is not the case when A is not invertible. Mathematically, the optimization problem has infinite set of solutions. The converged result will thus depends on the initialization process.
+
+```{r, warning=FALSE}
+for (i in 1:5){
+  X = rnorm(3)
+  lastX <- X+1
+  while (converge(X, lastX) == FALSE){
+    lastX = X
+    X = X - lambda*(A2 %*% X - b)
+  }
+  print(X)
+}
+```
+

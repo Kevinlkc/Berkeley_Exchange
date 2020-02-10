@@ -1,0 +1,250 @@
+---
+title: "Lab 4"
+author: "Kaicheng Luo"
+date: "2019/11/5"
+output: html_document
+---
+
+1. Introduction  
+This is a cononical paper by Ho et al. (2007) on causal inference. The data is accessible on Harvard Dataverse. The response variable is the act time by FDA to grant the approval of a new drug into the market. The predictors include the number of orders, the drug company, and so on. The one we should emphasize is the democrat representative in the Congress.  
+2. Motivation  
+Our goal is to numerically predict the time of action given all those covariates. In the original paper, they imposed the ignorability assumption and argued that controlling all those covariates will be quite enough for the explanation of the variance of the response. This casts light on the possibility of a nice prediction. We're going to compare the baseline result with the regression tree estimation and use cross-validation to gain a best model.
+3. Procedure & Improvement  
+First, we fit a baseline linear model with the built-in function in R with all the covariates we have. Then, we split our data into training set, validation set, and test set. The best model, given a class of methods, is choosed according to the performance in crossvalidation. In our case, it shall be the choice of how many covariates to include in the linear regression mdoel, or how large shall lambda be in the ridge/lasso regression. We adjust our model to find the optimal one for the training data.  
+The second part is the comparison between linear regression, ridge regression, lasso regression, and regression trees. This is where we're going to use the validation set. The result is shown as follows
+\begin{equation}
+  \begin{split}
+    Baseline &= 1106.2\\
+    Ridge &= 692.8\\
+    Lasso &= 682.9\\
+    Tree &= 1114.5\\
+    Imp. tree &= 883.4
+  \end{split}
+\end{equation}
+The best model we find is the lasso regression w./ $\lambda = 1.95$. Finally, we use all the data to fit a final model and report the accuracy by the test set.  
+Here we provide some explanations and intuitions about the comparison about all the methods. Compared with the baseline model, ridge regression and lasso regression introduces a regularization term. This prevents the coefficents, namely, the flexiblity of our estimation to blow up. It increases the stability of our prediction. The tree methods, though more complex, does not perform as good as simple regression because the observations of the dataset is relatively small (around 400). But the tree methods generally requires a large observation.  
+Here's the implementation of the whole process
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(car)
+library(rpart)
+library(rpart.plot)
+library(RWeka)
+library(rJava)
+library(glmnet)
+library(pls)
+```
+
+```{r}
+# Data Prepartion
+data <- read.csv("FDA-Carpenter.csv")
+# We perform similar data treatment 
+# The democrat is the senate is the treatment indicator, acttime is Y, and others are covariate.
+
+## rescaling
+data$hospdisc <- data$hospdisc/100000
+data$natreg <- data$natreg/100
+data$stafcder <- data$stafcder/100
+data$prevgenx <- data$prevgenx/100
+data$hhosleng <- data$hhosleng/10
+data$condavg3 <- data$condavg3/10
+data$orderent <- data$orderent/10
+data$vandavg3 <- data$vandavg3/10
+data$wpnoavg3 <- data$wpnoavg3/100
+
+# Split the training, validation, and test set
+set.seed(1)
+data <- data %>%
+  mutate(index = 1:nrow(data))
+trainingSet <- sample_frac(data, 0.6, replace = FALSE)
+validationSet <- sample_frac(data %>% filter(!(index %in% trainingSet$index)), 0.5, replace = F)
+testSet <- data %>% filter(!(index %in% trainingSet$index) & !(index %in% validationSet$index))
+trainingSet <- trainingSet %>% select(-index)
+validationSet <- validationSet %>% select(-index)
+testSet <- testSet %>% select(-index)
+```
+
+```{r}
+# CV
+# Create 5 folds
+trainingSet <- trainingSet %>%
+  mutate(instant = 1:nrow(trainingSet), fold = 0)
+tempdata <- trainingSet
+
+for (i in 1:5){
+  num = 50
+  if (i == 5){num = 45}
+  temp <-  sample_n(tempdata, num)
+  tempdata <- tempdata %>%
+    filter(!(instant %in% temp$instant))
+  trainingSet[trainingSet$instant %in% temp$instant,] <- trainingSet %>%
+    filter(instant %in% temp$instant) %>%
+    mutate(fold = i)
+}
+trainingSet <- trainingSet %>% select(-instant)
+```
+
+```{r}
+# 1. Baseline Linear Model
+MSE = matrix(rep(0,50), nrow = 5)
+for (i in 1:5){
+  for (j in 1:10){
+    trainingSet2 <- trainingSet %>%
+      filter(fold != i)
+    test <- trainingSet %>%
+      filter(fold == i)
+    test <- test %>%
+      select(-fold)
+    trainingSet2 <- as.matrix(trainingSet2 %>% select(-fold))
+    y0 <- test$acttime
+    y <- trainingSet2[,'acttime']
+    if (j == 1){
+      x <- trainingSet2[,-19]
+      test <- test %>% select(-acttime)
+    }
+    if (j == 2){
+      x <- trainingSet2[,'demsnmaj']
+      test <- test %>% select(demsnmaj)
+    }
+    if (j == 3){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg)
+    }
+    if (j == 4){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx)
+    }
+    if (j == 5){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d)
+    }
+    if (j == 6){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd', 'hhosleng')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d, hhosleng)
+    }
+    if (j == 7){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd', "hhosleng", "deathrt1")]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d, hhosleng, deathrt1)
+    }
+    if (j == 8){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd', "hhosleng", "deathrt1", 'lethal')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d, hhosleng, deathrt1, lethal)
+    }
+    if (j == 9){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd', "hhosleng", "deathrt1", 'lethal', 'orderent')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d, hhosleng, deathrt1, lethal, orderent)
+    }
+    if (j == 10){
+      x <- trainingSet2[,c('demsnmaj' , 'hospdisc' , 'natreg', 'prevgenx', 'd', "hhosleng", "deathrt1", 'lethal', 'orderent', 'vandavg3')]
+      test <- test %>% select(demsnmaj , hospdisc , natreg, prevgenx , d, hhosleng, deathrt1, lethal, orderent, vandavg3)
+    }
+    model <- lm(y~x)
+    pred <- cbind(1, as.matrix(test)) %*% model$coef
+    MSE[i,j] = mean((pred - y0)^2)
+  }
+}
+MSE
+which.min(apply(MSE,2,mean))
+min(apply(MSE,2,mean))
+```
+
+```{r}
+# Ridge Regression
+MSE_ridge = matrix(rep(0,1000), nrow = 5)
+for (i in 1:5){
+  for (j in 1:200){
+    trainingSet2 <- trainingSet %>%
+      filter(fold != i)
+    test <- trainingSet %>%
+      filter(fold == i)
+    test <- test %>%
+      select(-fold)
+    ridge.mod=glmnet(as.matrix(trainingSet2 %>% select(-fold))[, -19],as.matrix(trainingSet2)[,19],alpha=0,lambda=j)
+    MSE_ridge[i,j] = mean((predict(ridge.mod, s =j, newx = as.matrix(test %>% select(-acttime)))-test$acttime)^2)
+  }
+}
+which.min(apply(MSE_ridge,2,mean))
+min(apply(MSE_ridge,2,mean))
+```
+
+```{r}
+# Lasso Regression
+# Ridge Regression
+MSE_ridge = matrix(rep(0,1000), nrow = 5)
+for (i in 1:5){
+  for (j in 1:200){
+    trainingSet2 <- trainingSet %>%
+      filter(fold != i)
+    test <- trainingSet %>%
+      filter(fold == i)
+    test <- test %>%
+      select(-fold)
+    ridge.mod=glmnet(as.matrix(trainingSet2 %>% select(-fold))[, -19],as.matrix(trainingSet2)[,19],alpha=1,lambda=j/50)
+    MSE_ridge[i,j] = mean((predict(ridge.mod, s = j/50, newx = as.matrix(test %>% select(-acttime)))-test$acttime)^2)
+  }
+}
+which.min(apply(MSE_ridge,2,mean))
+min(apply(MSE_ridge,2,mean))
+```
+
+
+```{r}
+trainingSet <- trainingSet %>% select(-fold)
+model <- rpart(acttime ~., data = trainingSet)
+summary(model)
+rpart.plot(model, digits = 3)
+prediction = predict(model, testSet %>% select(-acttime), type = "vector")
+
+# The mean squared error of our prediction
+mean((prediction - testSet$acttime)^2)
+```
+
+```{r}
+model <- M5P(acttime ~., data = trainingSet)
+summary(model)
+prediction = predict(model, testSet %>% select(-acttime))
+
+# The mean squared error of our prediction
+mean((prediction - testSet$acttime)^2)
+ggplot() + theme_bw() +
+  geom_point(aes(x = 1:length(prediction), y = prediction), color = "maroon") +
+  geom_point(aes(x = 1:length(prediction), y = testSet$acttime), color = "orange")
+```
+
+```{r}
+# Finally, use the validation set to choose the best model
+# Note that for the simple regression model, the best model is the one with all the covariates
+# The best model for the ridge regression is that with lambda = 11
+# The best model for Lasso regression is that with lambda = 1.95
+# There are no tuning parameters for the regression tree method (w./ boosting)
+# 1. Linear regression
+model1 <- lm(acttime~., data = trainingSet)
+mean((validationSet$acttime - cbind(1, as.matrix(validationSet %>% select(-acttime))) %*% model1$coefficients)^2)
+# 2. Ridge regression
+model2 <- glmnet(as.matrix(validationSet %>% select(-acttime)), as.matrix(validationSet %>% select(acttime)), alpha = 0, lambda = 11)
+mean((validationSet$acttime - (predict(model2, newx = as.matrix(validationSet %>% select(-acttime)))))^2)
+# 3. Lasso regression
+model3 <- glmnet(as.matrix(validationSet %>% select(-acttime)), as.matrix(validationSet %>% select(acttime)), alpha = 1, lambda = 1.95)
+mean((validationSet$acttime - (predict(model3, newx = as.matrix(validationSet %>% select(-acttime)))))^2)
+# 4. Tree method
+model <- rpart(acttime ~., data = trainingSet)
+prediction = predict(model, validationSet %>% select(-acttime), type = "vector")
+mean((prediction - validationSet$acttime)^2)
+# 5. Improved tree method
+model <- M5P(acttime ~., data = trainingSet)
+prediction = predict(model, validationSet %>% select(-acttime))
+mean((prediction - validationSet$acttime)^2)
+```
+
+```{r}
+# The best model we've found is Lasso regression w./ \lambda = 1.95
+# Fit a final model with that and report the accuracy
+model4 <- glmnet(as.matrix(rbind(trainingSet, validationSet) %>% select(-acttime)), as.matrix(rbind(trainingSet, validationSet) %>% select(acttime)), alpha = 1, lambda = 1.95)
+mean((testSet$acttime - predict(model4, newx = as.matrix(testSet %>% select(-acttime))))^2)
+
+```
+

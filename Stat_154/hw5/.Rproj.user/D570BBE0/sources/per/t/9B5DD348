@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570663268163.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9B5DD348",
+    "lastKnownWriteTime" : 3539957267073859590,
+    "last_content_update" : 1570663268163,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "C206BDF2",
+        "caption" : "data_day",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=data_day&cache_key=C206BDF2",
+        "displayedObservations" : "365",
+        "environment" : "",
+        "object" : "data_day",
+        "preview" : "0",
+        "totalObservations" : "365",
+        "variables" : "17"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

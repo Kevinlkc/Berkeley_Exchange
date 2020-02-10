@@ -1,0 +1,4 @@
+"0","temp <- qr.Q(mtcars[,-1])
+"
+"2","Error in qr.Q(mtcars[, -1]) : 参数不是QR分解
+"

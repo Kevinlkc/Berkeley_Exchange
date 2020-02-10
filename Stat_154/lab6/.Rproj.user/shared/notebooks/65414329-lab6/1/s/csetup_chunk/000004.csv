@@ -1,0 +1,12 @@
+"0","library(pls)
+"
+"2","程辑包‘pls’是用R版本3.5.2 来建造的"
+"2","
+载入程辑包：‘pls’
+
+"
+"2","The following object is masked from ‘package:stats’:
+
+    loadings
+
+"

@@ -1,0 +1,13 @@
+---
+title: "hw4"
+author: "Kaicheng Luo"
+date: "2019/9/30"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(tidyr)
+```

@@ -1,0 +1,6 @@
+"0","library(FactoMineR)"
+"0","library(ggplot2)"
+"0","library(tidyverse)"
+"0","library(factoextra)"
+"0","data(""decathlon"")"
+"0","dat <- decathlon[,1:10]"

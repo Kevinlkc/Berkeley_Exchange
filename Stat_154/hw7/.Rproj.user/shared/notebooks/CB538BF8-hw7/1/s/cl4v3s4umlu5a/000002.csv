@@ -1,0 +1,5 @@
+"0","# Problem 6"
+"0","data(Boston)"
+"0","trainingSet <- Boston %>% dplyr::select(dis, nox)"
+"0","x = trainingSet$dis"
+"0","y = trainingSet$nox"

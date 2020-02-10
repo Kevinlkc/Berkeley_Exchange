@@ -1,0 +1,95 @@
+---
+title: "Lab3"
+author: "Kevin Luo"
+date: "2019/9/23"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+```
+
+\section*{Part 1: Minimizing a quadratic}
+\subsubsection*{1.1}
+```{r}
+f <- function(x){
+  return(0.5*(x-2)^2+1)
+}
+df <- function(x){
+  return(x-2)
+}
+temp <- seq(0,4,0.01)
+tempplotf <- data.frame(x = temp, y = f(temp))
+tempplotdf <- data.frame(x = temp, y = df(temp))
+tempplotf %>% ggplot() + theme_bw() +
+  geom_point(aes(x = x, y = y), color = 'maroon')
+tempplotdf %>% ggplot() + theme_bw() +
+  geom_point(aes(x = x, y = y), color = 'maroon')
+```
+
+\subsubsection*{1.2}
+```{r}
+x = rnorm(1)
+alpha = 1
+for (i in 1:10){
+  x = x - alpha*df(x)
+}
+x
+# x = 2 is obviously the minimum for f(x)
+```
+
+\subsubsection*{1.3}
+```{r}
+alpha <- 0.1
+x <- rnorm(2)
+A <- diag(c(1,2), nrow = 2)
+b <- matrix(c(1,1), ncol = 1)
+for (i in 1:100){
+  x = x - alpha*(A %*% x - b)
+}
+x
+```
+
+\section*{Part 2: OLS Regression}
+```{r}
+response <- 'mpg'
+predictors <- c('hp', 'qsec', 'wt') 
+M <- as.matrix(mtcars[ ,predictors]) 
+X <- cbind(intercept = 1, M)
+y <- mtcars[ ,response]
+y <- as.matrix(y, ncol = 1)
+```
+
+```{r}
+test <- lm(mpg~hp+qsec+wt, data = mtcars)
+test$coefficients / length(y)
+MSE <- function(beta){
+  return(t(X %*% beta - y) %*% (X %*% beta - y) / nrow(y))
+}
+dMSE <- function(beta){
+  return(2 * (t(X) %*% X %*% beta - t(X) %*% y) / nrow(y))
+}
+```
+
+```{r}
+beta <- rnorm(4)
+alpha <- 0.00001
+iteration <- 5000
+plotdata <- data.frame(index = 1:iteration, beta = rep(0,iteration))
+for (i in 1:iteration){
+  beta = beta - alpha * (dMSE(beta))
+  plotdata[i,'beta'] = MSE(beta)
+}
+plotdata %>%
+  ggplot(aes(x = index, y = beta)) +
+  geom_point()
+beta
+(solve(t(X) %*% X) %*% t(X) %*% y) / length(y)
+```
+
+

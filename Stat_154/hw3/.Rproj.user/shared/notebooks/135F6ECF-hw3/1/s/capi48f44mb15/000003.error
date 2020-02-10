@@ -1,0 +1,1 @@
+{"frames":[{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"solve(A2)","line_number":0},{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"solve.default(A2)","line_number":0}],"message":"Error in solve.default(A2) : \n  Lapack例行程序dgesv: 系统正好是奇异的: U[3,3] = 0\n"}

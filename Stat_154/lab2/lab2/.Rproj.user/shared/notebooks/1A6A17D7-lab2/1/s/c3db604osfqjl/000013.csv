@@ -1,0 +1,4 @@
+"0","temp <- My_ols(mtcars[,-1], mtcars[,'mpg'])
+"
+"2","Error in as.matrix(X) %*% matrix(coefficients, ncol = 1) : 非整合参数
+"

@@ -1,0 +1,101 @@
+---
+title: "lab 9"
+author: "Kaicheng Luo"
+date: "2019/11/18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+```
+
+```{r}
+Euclidean <- function(x, y)
+{
+  return(sqrt(sum((x-y)^2)))
+}
+my_kmeans <- function(X, k, d = Euclidean)
+{
+  convergence <- function(x, y){
+    for (i in 1:length(x)){
+      if (x[i]!=y[i]){return(FALSE)}
+    }
+    return(TRUE)
+  }
+  dimension <- ncol(X)
+  centroid <- matrix(nrow = k, ncol = dimension)
+  for (i in 1:k){
+    centroid[i,] <- apply(sample_frac(X, 0.3), 2, mean)
+  }
+  cluster <- rep(0, nrow(X))
+  lastcluster <- rep(1, nrow(X))
+  count <- 0
+  while (convergence(cluster, lastcluster) == FALSE)
+  {
+    if (count>1000000)
+    {
+      print("Do no converge in 1m steps")
+      break
+    }else{count = count+1}
+    lastcluster = cluster
+    for (i in 1:nrow(X)){
+      distance <- rep(0,3)
+      for (j in 1:k){
+        distance[j] <- d(X[i,], centroid[j,])
+      }
+      cluster[i] = which.min(distance)
+    }
+    for (i in 1:k){
+      centroid[i,] = apply(X[cluster == i,], 2, mean)
+    }
+  }
+  cluster_sizes <- rep(0,k)
+  for (i in 1:k)
+  {
+    cluster_sizes[i] = nrow(X[cluster == i,])
+  }
+  wss <- rep(0,k)
+  for (i in 1:k)
+  {
+    SUB <- X[cluster == i,]
+    for (j in 1:nrow(SUB))
+    {
+      wss[i] = wss[i] + sum((SUB[j,] - centroid[i,])^2)
+    }
+  }
+  center <- colMeans(X)
+  bss = sum((centroid - center)^2)
+  tss = sum((X - center)^2)
+  return(list("cluster_sizes" = cluster_sizes,
+              "cluster_means" = centroid,
+              "clustering_vector" = cluster,
+              "wss_cluster" = wss,
+              "bss_over_tss" = bss / tss))
+}
+
+```
+
+```{r}
+set.seed(1)
+result <- my_kmeans(iris[,1:4], 3)$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+
+```
+
+
+
+```{r}
+set.seed(1000)
+result <- my_kmeans(iris[,1:4], 3)$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+```
+

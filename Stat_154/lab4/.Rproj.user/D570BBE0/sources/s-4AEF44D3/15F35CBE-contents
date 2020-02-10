@@ -1,0 +1,56 @@
+---
+title: "Lab4"
+author: "Kaicheng Luo"
+date: "2019/9/30"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+```
+
+Some introductory code are as follows,
+```{r, include=FALSE}
+x <- seq(-1, 1, by = 0.0001)
+y <- sin(x * pi)
+plot(x, y, type = "l", lwd = 2, col = "#608EDB", las = 1, xlim = c(-1, 1), ylim = c(-1.5, 1.5))
+```
+
+```{r, include=FALSE}
+set.seed(553)
+x_pts <- runif(n = 2, min = -1, max = 1)
+y_pts <- sin(pi * x_pts)
+```
+
+Simulation
+```{r}
+# Model H0: y = coef_0
+# Model H1: y = coef_1a + coef_1b
+set.seed(12345)
+n_out <- 20000
+
+coef_0 <- vector()
+coef_1a <- vector()
+coef_1b <- vector()
+MSE_0 <- rep(0, n_out)
+MSE_1 <- rep(0, n_out)
+x_out <- runif(n_out, min = -1, max = 1)
+y_out <- sin(pi * x_out)
+for (i in 1:500){
+  x <- runif(n = 2, min = -1, max = 1)
+  y <- sin(x * pi)
+  coef_0 <- c(coef_0, (y[1]+y[2])/2)
+  coef_1a <- c(coef_1a, y[1] - x[1]*(y[2]-y[1])/(x[2]-x[1]))
+  coef_1b <- c(coef_1b, (y[2]-y[1])/(x[2]-x[1]))
+  for (j in 1:n_out){
+    MSE_0[i] = MSE_0[i] + ((y_out[j] - coef_0[i])^2)/n_out
+    MSE_1[i] = MSE_1[i] + ((y_out[j] - coef_1a - coef_1b * x_out[j])^2)/n_out
+  }
+}
+```
+
+
+

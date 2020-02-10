@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1569266660519.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C0A1F18B",
+    "lastKnownWriteTime" : 2317443269203525632,
+    "last_content_update" : 1569266660519,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "ADBE1F8E",
+        "caption" : "tempplot",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=tempplot&cache_key=ADBE1F8E",
+        "displayedObservations" : 401,
+        "environment" : "",
+        "object" : "tempplot",
+        "preview" : 0,
+        "totalObservations" : 401,
+        "variables" : 2
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

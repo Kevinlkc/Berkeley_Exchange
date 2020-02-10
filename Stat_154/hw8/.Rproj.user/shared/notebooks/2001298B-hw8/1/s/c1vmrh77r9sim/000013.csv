@@ -1,0 +1,3 @@
+"0","data.frame(""Predictors"" = c(""Slength"",""Swidth"",""Plength"",""Pwidth""), ""F_ratio"" = c(F_ratio(iris$Sepal.Length, iris$Species), F_ratio(iris$Sepal.Width, iris$Species), F_ratio(iris$Petal.Length, iris$Species), F_ratio(iris$Petal.Width, iris$Species))) %>% arrange(by = F_ratio) %>%"
+"0","  ggplot() + theme_bw() +"
+"0","    geom_bar(aes(x = Predictors, y = F_ratio), stat = ""identity"", width = .6)"

@@ -1,0 +1,349 @@
+"0","tinytex::install_tinytex()
+"
+"1","tlmgr revision 47303 (2018-04-05 19:52:22 +0200)
+tlmgr using installation: /usr/local/texlive/2018
+TeX Live (http://tug.org/texlive) version 2018
+"
+"2","Detected an existing tlmgr at /Library/TeX/texbin/tlmgr. It seems TeX Live has been installed (check tinytex::tinytex_root()). You are recommended to uninstall it, although TinyTeX should work well alongside another LaTeX distribution if a LaTeX document is compiled through tinytex::latexmk()."
+"2","试开URL’https://yihui.name/gh/tinytex/tools/install-unx.sh'
+"
+"2","Content type 'text/plain; charset=utf-8'"
+"2"," length 616 bytes
+"
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","
+"
+"2","downloaded 616 bytes
+
+"
+"1","Downloading install-tl-unx.tar.gz to /var/folders/3l/p5shg84s0y98y0tqjggmgsfw0000gn/T ...
+"
+"2","  "
+"2","% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   "
+"2","Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0"
+"2","100   338  100 "
+"2","  338    0     0    882      0 --:--:-- --:--:-- --:--:--   882100   338  100   338    0     0    881      0 --:--:-- --:--:-- --:--:--   880
+"
+"2"," 11 3"
+"2","848k   11  439k    0     0   329k      0  0:00:11  0:00:01  0:00:10  329k"
+"2","100 3"
+"2","848k  100 3848k    0     0  1956k      0  0:00:01  0:00:01 --:--:-- 5411k
+"
+"2","  % Total"
+"2","    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0"
+"2","100    81  100 "
+"2","   81    0     0    785      0 --:--:-- --:--:-- --:--:--   786
+"
+"2","  0   "
+"2","  0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   142  100   142    0     0    369      0 --:--:-- --:--:-- --:--:--  138k
+"
+"2","100   2"
+"2","95  100   295    0     0    678      0 --:--:-- --:--:-- --:--:--   678
+"
+"1","Automated TeX Live installation using profile: ../tinytex.profile
+"
+"1","Loading http://ctan.math.utah.edu/ctan/tex-archive/systems/texlive/tlnet/tlpkg/texlive.tlpdb
+"
+"1","Installing TeX Live 2019 from: http://ctan.math.utah.edu/ctan/tex-archive/systems/texlive/tlnet (not verified)
+Platform: x86_64-darwin => 'MacOSX current (10.12-) on x86_64'
+Distribution: net  (downloading)
+Using URL: http://ctan.math.utah.edu/ctan/tex-archive/systems/texlive/tlnet
+Directory for temporary files: /var/folders/3l/p5shg84s0y98y0tqjggmgsfw0000gn/T/5xxQo_hXRo
+Installing to: ./
+Installing [1/7, time/total: ??:??/??:??]: hyphen-base [22k]
+"
+"1","Installing [2/7, time/total: 00:00/00:00]: kpathsea [32k]
+"
+"1","Installing [3/7, time/total: 00:00/00:00]: kpathsea.x86_64-darwin [48k]
+"
+"1","Installing [4/7, time/total: 00:00/00:00]: tetex [71k]
+"
+"1","Installing [5/7, time/total: 00:00/00:00]: tetex.x86_64-darwin [1k]
+"
+"1","Installing [6/7, time/total: 00:00/00:00]: texlive.infra [212k]
+"
+"1","Installing [7/7, time/total: 00:00/00:00]: texlive.infra.x86_64-darwin [342k]
+"
+"1","Time used for installing the packages: 00:01
+running mktexlsr ./texmf-dist ...
+"
+"1","writing fmtutil.cnf to ./texmf-dist/web2c/fmtutil.cnf
+writing updmap.cfg to ./texmf-dist/web2c/updmap.cfg
+"
+"1","writing language.dat to ./texmf-var/tex/generic/config/language.dat
+writing language.def to ./texmf-var/tex/generic/config/language.def
+writing language.dat.lua to ./texmf-var/tex/generic/config/language.dat.lua
+running mktexlsr ./texmf-var ./texmf-config ./texmf-dist ...
+"
+"1","running updmap-sys --nohash ..."
+"1","done
+re-running mktexlsr ./texmf-var ./texmf-config ...
+"
+"1","pre-generating all format files, be patient...
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-strict --all ..."
+"1","done
+running package-specific postactions
+finished with package-specific postactions
+
+Logfile: ./install-tl.log
+"
+"1","tlmgr: setting default package repository to http://mirror.ctan.org/systems/texlive/tlnet
+"
+"1","tlmgr: package repository http://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/24, ??:??/??:??] install: babel [144k]
+"
+"1","[2/24, 00:01/01:20] install: cm [233k]
+"
+"1","[3/24, 00:01/00:30] install: dehyph [46k]
+"
+"1","[4/24, 00:01/00:27] install: dvipdfmx.x86_64-darwin [426k]
+"
+"1","[5/24, 00:01/00:13] install: dvipdfmx [27k]
+"
+"1","[6/24, 00:01/00:13] install: etex [12k]
+"
+"1","[7/24, 00:01/00:13] install: glyphlist [25k]
+"
+"1","[8/24, 00:02/00:25] install: knuth-lib [30k]
+"
+"1","[9/24, 00:02/00:24] install: latex [154k]
+"
+"1","[10/24, 00:02/00:21] install: latex-base-dev [155k]
+"
+"1","[11/24, 00:02/00:18] install: latex-bin.x86_64-darwin [1k]
+"
+"1","[12/24, 00:02/00:18] install: latex-bin [1k]
+"
+"1","[13/24, 00:02/00:18] install: latex-fonts [18k]
+"
+"1","[14/24, 00:02/00:18] install: latexconfig [5k]
+"
+"1","[15/24, 00:02/00:18] install: luatex.x86_64-darwin [2243k]
+"
+"1","[16/24, 00:03/00:09] install: luatex [13k]
+"
+"1","[17/24, 00:03/00:09] install: pdftex.x86_64-darwin [895k]
+"
+"1","[18/24, 00:03/00:07] install: pdftex [37k]
+"
+"1","[19/24, 00:03/00:07] install: plain [70k]
+"
+"1","[20/24, 00:03/00:07] install: tex-ini-files [4k]
+"
+"1","[21/24, 00:03/00:07] install: unicode-data [258k]
+"
+"1","[22/24, 00:04/00:09] install: xetex.x86_64-darwin [6842k]
+"
+"1","[23/24, 00:05/00:05] install: xetex [7k]
+"
+"1","[24/24, 00:05/00:05] install: xetexconfig [1k]
+"
+"1","running mktexlsr ...
+"
+"1","done running mktexlsr.
+"
+"1","running updmap-sys ...
+"
+"1","done running updmap-sys.
+regenerating fmtutil.cnf in /private/var/folders/3l/p5shg84s0y98y0tqjggmgsfw0000gn/T/texlive/texmf-dist
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine xetex ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine xetex.
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine luatex ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine luatex.
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine pdftex ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine pdftex.
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine luajittex ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine luajittex.
+tlmgr: package log updated: /private/var/folders/3l/p5shg84s0y98y0tqjggmgsfw0000gn/T/texlive/texmf-var/web2c/tlmgr.log
+"
+"1","tlmgr: package repository http://mirrors.concertpass.com/tex-archive/systems/texlive/tlnet (not verified: gpg unavailable)
+tlmgr install: package already present: dvipdfmx
+[1/57, ??:??/??:??] install: amscls [32k]
+"
+"1","[2/57, 00:01/11:37] install: amsfonts [3542k]
+"
+"1","[3/57, 00:02/00:12] install: amsmath [30k]
+"
+"1","[4/57, 00:02/00:12] install: bibtex.x86_64-darwin [84k]
+"
+"1","[5/57, 00:02/00:11] install: bibtex [15k]
+"
+"1","[6/57, 00:02/00:11] install: booktabs [3k]
+"
+"1","[7/57, 00:02/00:11] install: caption [34k]
+"
+"1","[8/57, 00:02/00:11] install: dvips.x86_64-darwin [149k]
+"
+"1","[9/57, 00:02/00:11] install: dvips [34k]
+"
+"1","[10/57, 00:02/00:11] install: ec [258k]
+"
+"1","[11/57, 00:03/00:15] install: etoolbox [9k]
+"
+"1","[12/57, 00:03/00:15] install: euenc [4k]
+"
+"1","[13/57, 00:03/00:15] install: fancyvrb [12k]
+"
+"1","[14/57, 00:03/00:15] install: float [3k]
+"
+"1","[15/57, 00:03/00:15] install: fontspec [27k]
+"
+"1","[16/57, 00:03/00:15] install: framed [8k]
+"
+"1","[17/57, 00:04/00:20] install: geometry [9k]
+"
+"1","[18/57, 00:04/00:20] install: graphics [15k]
+"
+"1","[19/57, 00:04/00:20] install: graphics-cfg [2k]
+"
+"1","[20/57, 00:04/00:20] install: graphics-def [10k]
+"
+"1","[21/57, 00:04/00:20] install: gsftopk.x86_64-darwin [41k]
+"
+"1","[22/57, 00:04/00:20] install: gsftopk [4k]
+"
+"1","[23/57, 00:04/00:20] install: helvetic [527k]
+"
+"1","[24/57, 00:05/00:22] install: hyperref [106k]
+"
+"1","[25/57, 00:05/00:22] install: ifluatex [3k]
+"
+"1","[26/57, 00:05/00:22] install: iftex [2k]
+"
+"1","[27/57, 00:05/00:22] install: ifxetex [2k]
+"
+"1","[28/57, 00:05/00:22] install: inconsolata [293k]
+"
+"1","[29/57, 00:05/00:20] install: l3backend [12k]
+"
+"1","[30/57, 00:06/00:25] install: l3kernel [140k]
+"
+"1","[31/57, 00:06/00:24] install: l3packages [20k]
+"
+"1","[32/57, 00:06/00:24] install: latexmk.x86_64-darwin [1k]
+"
+"1","[33/57, 00:06/00:24] install: latexmk [91k]
+"
+"1","[34/57, 00:06/00:23] install: lm [11665k]
+"
+"1","[35/57, 00:09/00:11] install: lualibs [117k]
+"
+"1","[36/57, 00:09/00:11] install: luaotfload.x86_64-darwin [1k]
+"
+"1","[37/57, 00:09/00:11] install: luaotfload [546k]
+"
+"1","[38/57, 00:10/00:12] install: makeindex.x86_64-darwin [48k]
+"
+"1","[39/57, 00:10/00:12] install: makeindex [5k]
+"
+"1","[40/57, 00:10/00:12] install: mathspec [10k]
+"
+"1","[41/57, 00:10/00:12] install: metafont.x86_64-darwin [236k]
+"
+"1","[42/57, 00:11/00:13] install: metafont [33k]
+"
+"1","[43/57, 00:11/00:13] install: mfware.x86_64-darwin [119k]
+"
+"1","[44/57, 00:11/00:13] install: mfware [4k]
+"
+"1","[45/57, 00:11/00:13] install: natbib [17k]
+"
+"1","[46/57, 00:11/00:13] install: oberdiek [222k]
+"
+"1","[47/57, 00:11/00:13] install: tex.x86_64-darwin [217k]
+"
+"1","[48/57, 00:12/00:14] install: tex [1k]
+"
+"1","[49/57, 00:12/00:14] install: times [281k]
+"
+"1","[50/57, 00:12/00:13] install: tipa [2809k]
+"
+"1","[51/57, 00:13/00:13] install: titling [3k]
+"
+"1","[52/57, 00:13/00:13] install: tools [40k]
+"
+"1","[53/57, 00:13/00:13] install: upquote [2k]
+"
+"1","[54/57, 00:13/00:13] install: url [6k]
+"
+"1","[55/57, 00:13/00:13] install: xkeyval [13k]
+"
+"1","[56/57, 00:13/00:13] install: xunicode [26k]
+"
+"1","[57/57, 00:13/00:13] install: zapfding [46k]
+"
+"1","running mktexlsr ...
+"
+"1","done running mktexlsr.
+"
+"1","running updmap-sys ...
+"
+"1","done running updmap-sys.
+regenerating fmtutil.cnf in /Users/kevin/Library/TinyTeX/texmf-dist
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine tex ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --no-error-if-no-format --byengine tex.
+running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --byfmt mf ...
+"
+"1","done running fmtutil-sys --no-error-if-no-engine=luajittex,mfluajit --byfmt mf.
+tlmgr: package log updated: /Users/kevin/Library/TinyTeX/texmf-var/web2c/tlmgr.log
+"
+"2","TinyTeX installed to /Users/kevin/Library/TinyTeX
+"

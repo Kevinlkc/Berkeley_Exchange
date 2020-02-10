@@ -1,0 +1,7 @@
+"0","# Graph of Overfitting"
+"0","# n = 2"
+"0","X1 <- cbind(X,X^2)"
+"0","model_1 <- lm(Y~X1)"
+"0","# Store the coefficients"
+"0","Plotdata1 <- cbind(1,X_true, X_true^2)"
+"0","predicted1 <- Plotdata1 %*% model_1$coefficients"

@@ -1,0 +1,5 @@
+"0","finalPCR <- pcr(pH~.-fold, data = data, scale = T)
+"
+"2","Error in model.frame.default(formula = pH ~ . - fold, data = data) : 
+  参数'fold'的种类(list)不对
+"

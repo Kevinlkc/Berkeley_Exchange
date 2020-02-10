@@ -1,0 +1,1 @@
+{"frames":[{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"qr.Q(mtcars[, -1])","line_number":0},{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"stop(\"argument is not a QR decomposition\")","line_number":0}],"message":"Error in qr.Q(mtcars[, -1]) : 参数不是QR分解\n"}

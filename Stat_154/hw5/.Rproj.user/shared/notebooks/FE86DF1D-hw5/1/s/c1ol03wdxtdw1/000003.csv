@@ -1,0 +1,8 @@
+"0","data.frame(""Complexity"" = 1:5, training_MSE = MSE, test_MSE = test_MSE) %>%"
+"0","  ggplot() + theme_bw() +"
+"0","  geom_line(aes(x = Complexity, y = training_MSE), color = 'maroon', size = 1) +"
+"0","  geom_line(aes(x = Complexity, y = test_MSE), color = 'purple', size = 1) +"
+"0","  labs("
+"0","    title = ""MSE of the Bike Sharing Model w.r.t # of Regressors"","
+"0","    caption = ""Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"""
+"0","  )"

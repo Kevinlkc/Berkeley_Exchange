@@ -1,0 +1,31 @@
+"0","summary(tree.carseats)
+"
+"1","
+Classification tree:
+"
+"1","tree(formula = High ~ . - Sales, data = Carseats)
+"
+"1","Variables actually used in tree construction:
+"
+"1","[1]"
+"1"," ""High.1"""
+"1","
+"
+"1","Number of terminal nodes:  2 
+"
+"1","Residual mean deviance:  0 = 0 / 398 
+"
+"1","Misclassification error rate:"
+"1"," "
+"1","0"
+"1"," "
+"1","="
+"1"," "
+"1","0"
+"1"," "
+"1","/"
+"1"," "
+"1","400"
+"1"," "
+"1","
+"

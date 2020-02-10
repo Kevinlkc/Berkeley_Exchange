@@ -1,0 +1,8 @@
+"0","# Neymanian Inference"
+"0","tau_hat = mean(ytreat - ycontrol)"
+"0","V_hat = sum((ytreat - ycontrol - tau_hat)^2) /n.pairs / (n.pairs-1)"
+"0","print(paste(""Confidence Interval = ["", tau_hat - 1.96*sqrt(V_hat), "","", tau_hat + 1.96*sqrt(V_hat), ""]"", sep = """"))"
+"1","[1]"
+"1"," ""Confidence Interval = [1.83204244036545,40.0346242263012]"""
+"1","
+"

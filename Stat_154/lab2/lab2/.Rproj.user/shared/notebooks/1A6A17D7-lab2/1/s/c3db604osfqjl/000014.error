@@ -1,0 +1,1 @@
+{"frames":[{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"My_ols(mtcars[, -1], mtcars[, \"mpg\"])","line_number":0}],"message":"Error in as.matrix(X) %*% matrix(coefficients, ncol = 1) : 非整合参数\n"}

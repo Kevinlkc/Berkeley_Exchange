@@ -1,0 +1,4 @@
+"0","??x0 = randn(n=1)
+"
+"2","Error in randn(n = 1) : 没有""randn""这个函数
+"

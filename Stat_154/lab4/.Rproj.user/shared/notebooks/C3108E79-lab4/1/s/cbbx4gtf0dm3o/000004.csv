@@ -1,0 +1,4 @@
+"0","x_pts <- runif(n = 2, min = -1, max = 1) y_pts <- sin(pi * x_pts)
+"
+"2","错误: unexpected symbol in ""x_pts <- runif(n = 2, min = -1, max = 1) y_pts""
+"

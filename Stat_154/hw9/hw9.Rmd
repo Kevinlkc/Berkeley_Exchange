@@ -1,0 +1,247 @@
+---
+title: "hw9"
+author: "Kaicheng Luo"
+date: "2019/11/9"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=F, message=F}
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(MASS)
+library(mvtnorm)
+```
+
+\section*{Part 1: Linear Discriminant Analysis}
+```{r}
+lda_fit <- function(X, y)
+{
+  # X: predictor matrix, y: response matrix (factor)
+  y <- factor(y)
+  n = length(y)
+  k = length(levels(y))
+  pi_hat = rep(0, k)
+  mu_hat = matrix(0, nrow = k, ncol = ncol(X))
+  sigma_hat = matrix(0, nrow = ncol(X), ncol = ncol(X))
+  count = 0
+  for (i in levels(y))
+  {
+    count = count+1
+    subset = X[y == i, ]
+    pi_hat[count] = nrow(subset) / n
+    mu_hat[count, ] = apply(subset, 2, mean)
+    for (k in 1:nrow(subset))
+    {
+      sigma_hat = sigma_hat + t(as.matrix(subset[k,] - mu_hat[count, ])) %*% (as.matrix(subset[k,] - mu_hat[count, ])) / (n-k)
+    }
+  }
+  return(list("pi" = pi_hat,"mu" = mu_hat,"sigma" = sigma_hat))
+}
+```
+
+```{r}
+lda_predict <- function(fit, newdata)
+{
+  # fit is a list returned by lda_fit, and new data is a m by p matrix of new features
+  sigma = matrix(0, nrow = nrow(newdata), ncol = nrow(fit$mu))
+  posterior = matrix(0, nrow = nrow(newdata), ncol = nrow(fit$mu))
+  for (j in 1:nrow(newdata))
+  {
+    for (i in 1:length(fit$pi))
+    {
+      posterior[j, i] = (fit$pi[i]*dmvnorm(newdata[j, ], mean = fit$mu[i, ], sigma = fit$sigma))
+      sigma[j, i] = log(fit$pi[i]) - 0.5*t(fit$mu[i, ]) %*% solve(fit$sigma) %*% fit$mu[i,] +
+        t(fit$mu[i,]) %*% solve(fit$sigma) %*% t(as.matrix(newdata[j,]))
+    }
+  }
+  # We can either use the largest sigma or the largest posterior
+  class = as.factor(levels(train_set[,5])[apply(sigma, 1, which.max)])
+  posterior / apply(posterior, 1, sum)
+  return(list("Prediction" = class, "Posterior" = posterior))
+}
+```
+
+```{r}
+train_set <- iris[c(1:47, 51:97, 101:146),]
+test_set <- iris[c(48:50, 98:100, 147:150),]
+lda_fit(train_set[,-5], train_set[,5])
+fit <- lda_fit(train_set[,-5], train_set[,5])
+lda_predict(fit, test_set[,-5])
+# Note that that's very accurate prediction!
+test_set[,5]
+```
+
+\section*{Part 2: Quadratic Discriminant Analysis}
+```{r}
+qda_fit <- function(X, y)
+{
+  # X: predictor matrix, y: response matrix (factor)
+  y <- factor(y)
+  n = length(y)
+  k = length(levels(y))
+  pi_hat = rep(0, k)
+  mu_hat = matrix(0, nrow = k, ncol = ncol(X))
+  sigma_hat = list()
+  count = 0
+  for (i in levels(y))
+  {
+    count = count+1
+    subset = X[y == i, ]
+    pi_hat[count] = nrow(subset) / n
+    mu_hat[count, ] = apply(subset, 2, mean)
+    sigma_hat0 = matrix(0, nrow = ncol(X), ncol = ncol(X))
+    for (k in 1:nrow(subset))
+    {
+      sigma_hat0 = sigma_hat0 + t(as.matrix(subset[k,] - mu_hat[count, ])) %*% (as.matrix(subset[k,] - mu_hat[count, ])) / (nrow(subset) - 1)
+    }
+    sigma_hat <- c(sigma_hat, list(sigma_hat0))
+  }
+  return(list("pi" = pi_hat,"mu" = mu_hat,"sigma" = sigma_hat))
+}
+```
+
+```{r}
+predict_qda <- function(fit, newdata)
+{
+  # fit is a list returned by lda_fit, and new data is a m by p matrix of new features
+  sigma = matrix(0, nrow = nrow(newdata), ncol = nrow(fit$mu))
+  posterior = matrix(0, nrow = nrow(newdata), ncol = nrow(fit$mu))
+  for (j in 1:nrow(newdata))
+  {
+    for (i in 1:length(fit$pi))
+    {
+      posterior[j, i] = (fit$pi[i]*dmvnorm(newdata[j, ], mean = fit$mu[i, ], sigma = fit$sigma[[i]]))
+    }
+  }
+  # We can either use the largest sigma or the largest posterior
+  posterior / apply(posterior, 1, sum)
+  class = as.factor(levels(train_set[,5])[apply(posterior, 1, which.max)])
+  return(list("Prediction" = class, "Posterior" = posterior))
+}
+```
+
+```{r}
+train_set <- iris[c(1:47, 51:97, 101:146),]
+test_set <- iris[c(48:50, 98:100, 147:150),]
+qda_fit(train_set[,-5], train_set[,5])
+fit <- qda_fit(train_set[,-5], train_set[,5])
+predict_qda(fit, test_set[,-5])
+# Note that that's very accurate prediction!
+test_set[,5]
+```
+
+```{r}
+L2norm <- function(x1, x2)
+{
+  return(sqrt(mean((x1-x2)^2)))
+}
+pred_knn <- function(train, test, label, k = 1)
+{
+  distance <- matrix(0, nrow = nrow(test), ncol = nrow(train))
+  result = rep(label[1], nrow(test))
+  for (i in 1:nrow(test))
+  {
+    for (j in 1:nrow(train))
+    {
+      distance[i,j] = L2norm(as.numeric(test[i, ]), as.numeric(train[j, ]))
+    }
+  }
+  neighbour = matrix(0, nrow = nrow(test), ncol = k)
+  for (i in 1:nrow(test))
+  {
+    neighbour[i,] = label[which(rank(distance[i,], ties.method = "random") <= k)]
+  }
+  count = matrix(0, nrow = nrow(test), ncol = length(levels(label)))
+  for (i in 1:nrow(neighbour)){
+    for (j in 1:ncol(neighbour)){
+      for (k in 1:length(levels(label))){
+        if (neighbour[i,j] == k){
+          count[i, k] = count[i, k] + 1
+        }
+      }
+    }
+  }
+  return(as.factor(levels(label)[apply(count, 1, which.max)]))
+}
+```
+
+```{r}
+training <- c(1:47, 51:97, 101:146)
+testing <- c(48:50, 98:100, 147:150)
+train_set <- iris[training, ]
+test_set <- iris[testing, ]
+# Given reasonable choice of k, KNN prediction is also accurate on these test sets
+pred_knn(train_set[, -5], test_set[, -5], train_set$Species, k=2)
+```
+
+```{r, warning=F, message=F}
+find_kcv <- function(X_train, Y_train, K = 1:10, nfold = 5)
+{
+  # Create 5 folds
+  trainingSet <- cbind(X_train, Y_train)
+  trainingSet <- trainingSet %>%
+    mutate(instant = 1:nrow(trainingSet), fold = 0)
+  tempdata <- trainingSet
+  
+  for (i in 1:5){
+    num = 28
+    temp <-  sample_n(tempdata, num)
+    tempdata <- tempdata %>%
+      filter(!(instant %in% temp$instant))
+    trainingSet[trainingSet$instant %in% temp$instant,] <- trainingSet %>%
+      filter(instant %in% temp$instant) %>%
+      mutate(fold = i)
+  }
+  trainingSet <- trainingSet %>% dplyr::select(-instant)
+  
+  accuracy = matrix(0, nrow = 5, ncol = length(1:10))
+  i = k = 1
+  for (i in 1:5){
+    for (k in 1:10){
+      trainingSet2 <- trainingSet %>%
+        filter(fold != i)
+      test <- trainingSet %>%
+        filter(fold == i)
+      test <- test %>%
+        dplyr::select(-fold)
+      pred <- pred_knn(trainingSet2[,c(-5,-6)], test[,c(-5,-6)], trainingSet2[,5], k = k)
+      for (j in 1:length(pred))
+      {
+        if (pred[j] == test[j,5]){accuracy[i,k] = accuracy[i,k] + 1}
+      }
+    }
+  }
+  return(which.max(apply(accuracy, 2, mean)))
+}
+```
+
+```{r}
+# Note that the answer might dependent on the sampling process in cross-validation, so setseed first
+set.seed(100)
+find_kcv(train_set[ , -5], train_set[ , 5])
+```
+
+```{r}
+# Confusion Matrix
+train_idx <- sample(nrow(iris), 90)
+train_set <- iris[train_idx, ]
+test_set <- iris[-train_idx, ]
+fit <- lda_fit(train_set[,-5], train_set[,5])
+lda_result <- lda_predict(fit, test_set[,-5])$Prediction
+fit <- qda_fit(train_set[,-5], train_set[,5])
+qda_result <- predict_qda(fit, test_set[,-5])$Prediction
+knn_result <- pred_knn(train_set[,-5], test_set[,-5], train_set[,5], k = 3)
+```
+
+```{r}
+table(lda_result, test_set[,5])
+table(qda_result, test_set[,5])
+table(knn_result, test_set[,5])
+```
+
+Test Error Rate for Both LDA and QDA are 3.33%  
+Test Error Rate for kNN is 5%  
+Remark: The results show that LDA and QDA are both performing well in the prediction of the iris dataset, constructing an accuracy of around 97%. kNN is performing slightly worse. The intuition behind LDA and QDA is minimizing the Mohabanoblus distance between the observations and the training set. kNN, on the other hand, minimizes the Euclidean distance. Though we do not observe a very significant difference between the accuracy. They differ greatly in terms of computing power. As a lazy learner, kNN algorithm have no pre-trained model at the training phase, leading to a huge increase in computing power when it comes to predictions.
+

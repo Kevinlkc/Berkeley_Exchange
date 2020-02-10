@@ -1,0 +1,3 @@
+"0","# The previous day returns are not so correlated to today's returns (Corr(Today, lag)<0.05)"
+"0","ggplot() + theme_bw() +"
+"0","  geom_point(aes(x = Year, y = Volume), data = Smarket)"

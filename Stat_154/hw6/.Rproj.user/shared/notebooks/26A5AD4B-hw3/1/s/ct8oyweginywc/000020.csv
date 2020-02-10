@@ -1,0 +1,4 @@
+"0","hist(w.ran, breaks = 50, col = ""grey"", border = NA,"
+"0","     xlab = expression(hat(tau)), "
+"0","     ylab = """", yaxt = 'n', "
+"0","     main = ""randomization distribution - MPstar data"")"

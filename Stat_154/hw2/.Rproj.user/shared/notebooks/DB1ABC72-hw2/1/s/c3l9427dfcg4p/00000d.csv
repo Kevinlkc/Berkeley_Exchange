@@ -1,0 +1,6 @@
+"0","data <- read.csv(""Advertising.csv"", col.names = ""X"")
+"
+"2","表头名称和'col.names'的长度不一样"
+"2","Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
+  列的数目比列的名字要多
+"

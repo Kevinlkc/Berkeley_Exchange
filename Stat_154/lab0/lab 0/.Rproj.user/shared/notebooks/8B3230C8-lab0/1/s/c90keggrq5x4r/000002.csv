@@ -1,0 +1,5 @@
+"0","u <- v/vnorm(c(v))
+"
+"2","Recycling array of length 1 in vector-array arithmetic is deprecated.
+  Use c() or as.vector() instead.
+"

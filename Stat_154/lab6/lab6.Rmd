@@ -1,0 +1,134 @@
+---
+title: "lab6"
+author: "Kaicheng Luo"
+date: "2019/10/14"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(glmnet)
+library(ISLR)
+library(pls)
+```
+
+```{r}
+# Deal with the na values as suggested
+data(Hitters)
+Hitters=na.omit(Hitters)
+x=model.matrix(Salary~.,Hitters)[,-1]
+y=Hitters$Salary
+```
+
+```{r}
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x,y,alpha=0,lambda=grid)
+```
+
+```{r}
+dim(coef(ridge.mod))
+# Accessing the coefficient when lambda = 11498
+coef(ridge.mod)[,50]
+# Predicting the coefficients when lambda = 50
+predict(ridge.mod,s=50,type="coefficients")[1:20,]
+```
+
+```{r}
+# Setseed for replication purpose
+set.seed (1)
+# Split into training set and test set
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.test=y[test]
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid,thresh=1e-12)
+ridge.pred=predict(ridge.mod,s=4,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+# A very large lambda won't help
+ridge.pred=predict(ridge.mod,s=1e10,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+```
+
+```{r}
+ridge.pred = predict(ridge.mod,s=0,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+lm(y~x, subset=train)
+predict(ridge.mod,s=0,type="coefficients")[1:20,]
+```
+```{r}
+# Use cross-validation to determine lambda and calculate the corresponding test MSE
+set.seed(1)
+cv.out=cv.glmnet(x[train ,],y[train],alpha=0)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+bestlam
+ridge.pred=predict(ridge.mod,s=bestlam ,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+# And hence we derive our best model with the optimal choice of lambda
+out=glmnet(x,y,alpha=0)
+predict(out,type="coefficients",s=bestlam)[1:20,]
+```
+
+```{r}
+# Now we move on to Lasso regression
+# First, get a visualization about what you get from the lasso regression
+lasso.mod=glmnet(x[train ,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+```
+
+```{r}
+set.seed (1)
+# By the same procedures, cross-validate your results to determine the best lambda
+cv.out=cv.glmnet(x[train ,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam ,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+# The MSE isn't reduced as tremendously as Ridge regression, but the advantage is that neat regression coef
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:20,]
+lasso.coef
+```
+```{r}
+# Implementing PCR
+set.seed (2)
+pcr.fit=pcr(Salary~., data=Hitters ,scale=TRUE, validation ="CV")
+summary(pcr.fit)
+# Cross-validation to determine how many number of components to keep
+validationplot(pcr.fit,val.type="MSEP")
+
+# Let's just use the training set
+set.seed (1)
+pcr.fit=pcr(Salary~., data=Hitters,subset=train,scale=TRUE, validation ="CV")
+validationplot(pcr.fit,val.type="MSEP")
+pcr.pred=predict(pcr.fit,x[test,],ncomp=7)
+mean((pcr.pred-y.test)^2)
+```
+
+```{r}
+# Note that we've already determined that the optimal component to keep is 7
+pcr.fit=pcr(y~x,scale=TRUE,ncomp=7)
+# We can fit a model according to that
+summary(pcr.fit)
+```
+
+```{r}
+# PLSR
+# Once again, cross-validation and optimal dimension choice
+set.seed (1)
+pls.fit=plsr(Salary~., data=Hitters ,subset=train,scale=TRUE, validation = "CV")
+summary(pls.fit)
+validationplot(pls.fit,val.type="MSEP")
+pls.pred=predict(pls.fit,x[test,],ncomp=2)
+# The test MSE is 101417.5, smaller than OLS
+mean((pls.pred-y.test)^2)
+```
+
+```{r}
+# Finally, use pls on the full data to get the regression estimates
+pls.fit=plsr(Salary~., data=Hitters ,scale=TRUE,ncomp=2)
+summary(pls.fit)
+```
+

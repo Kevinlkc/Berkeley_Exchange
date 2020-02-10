@@ -1,0 +1,53 @@
+---
+title: "hw2"
+author: "Kevin Luo"
+date: "2019/9/15"
+output: 
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE, message=FALSE, warning= FALSE}
+library(tidyverse)
+library(tidyr)
+library(stargazer)
+```
+
+Implementing Regression by Successive Orthogonalization:  
+Note that in our expectation, Gamma[] shall be an upper triangular matrix  
+z[] shall be the residual matrix, and Beta[] shall be a vector showing coefficents  
+```{r}
+data <- read.csv("Advertising.csv", row.names = "X")
+z <- matrix(nrow = nrow(data), ncol = ncol(data)+1)
+Gamma <- matrix(nrow = nrow(data), ncol = ncol(data)+1)
+Beta <- vector(length = ncol(data)-2)
+```
+
+```{r}
+# Step 1 initialize X[,1] and Z[,1]
+temp <- rep(1,nrow(data))
+data <- data %>%
+  add_column(temp, .before = T)
+z[,1] = temp
+```
+
+```{r}
+# Step 2 & 3
+for (p in 2:ncol(data)){
+  for (j in 2:p){
+    for (l in 1:(j-1)){
+      Gamma[l,j] = t(z[,l]) %*% data[,j] / t(z[,l] %*% z[,l])
+    }
+    z[,j] = data[,j]
+    for (k in 1:(j-1)){
+      z[,j] = z[,j] - Gamma[k,j] * z[,k]
+    }
+  }
+  Beta[p-1] = t(z[,p]) %*% data[,'sales'] / (t(z[,p]) %*% z[,p])
+}
+# We can compare our results with those implemented by the built-in library of R
+result <- lm(sales~. ,data = data)
+result$coefficients
+Beta[-4]
+```
+

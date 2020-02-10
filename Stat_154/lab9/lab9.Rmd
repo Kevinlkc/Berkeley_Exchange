@@ -1,0 +1,169 @@
+---
+title: "lab 9"
+author: "Kaicheng Luo"
+date: "2019/11/18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+```
+
+```{r}
+Euclidean <- function(x, y)
+{
+  return(sqrt(sum((x-y)^2)))
+}
+Manhattan <- function(x, y)
+{
+  return(sum(abs(x-y)))
+}
+my_kmeans <- function(X, k, d = Euclidean)
+{
+  convergence <- function(x, y){
+    for (i in 1:length(x)){
+      if (x[i]!=y[i]){return(FALSE)}
+    }
+    return(TRUE)
+  }
+  dimension <- ncol(X)
+  centroid <- matrix(nrow = k, ncol = dimension)
+  for (i in 1:k){
+    centroid[i,] <- apply(sample_frac(X, 0.3), 2, mean)
+  }
+  cluster <- rep(0, nrow(X))
+  lastcluster <- rep(1, nrow(X))
+  count <- 0
+  while (convergence(cluster, lastcluster) == FALSE)
+  {
+    if (count>1000000)
+    {
+      print("Do no converge in 1m steps")
+      break
+    }else{count = count+1}
+    lastcluster = cluster
+    for (i in 1:nrow(X)){
+      distance <- rep(0,3)
+      for (j in 1:k){
+        distance[j] <- d(X[i,], centroid[j,])
+      }
+      cluster[i] = which.min(distance)
+    }
+    for (i in 1:k){
+      centroid[i,] = apply(X[cluster == i,], 2, mean)
+    }
+  }
+  cluster_sizes <- rep(0,k)
+  for (i in 1:k)
+  {
+    cluster_sizes[i] = nrow(X[cluster == i,])
+  }
+  wss <- rep(0,k)
+  for (i in 1:k)
+  {
+    SUB <- X[cluster == i,]
+    for (j in 1:nrow(SUB))
+    {
+      wss[i] = wss[i] + sum((SUB[j,] - centroid[i,])^2)
+    }
+  }
+  center <- colMeans(X)
+  bss = 0
+  for (i in 1:k)
+  {
+    bss = bss + cluster_sizes[i] * sum((centroid[i, ] - center)^2)
+  }
+  tss = 0
+  for (i in 1:nrow(X))
+  {
+    tss = tss + sum((X[i,] - center)^2)
+  }
+  return(list("cluster_sizes" = cluster_sizes,
+              "cluster_means" = centroid,
+              "clustering_vector" = cluster,
+              "wss_cluster" = wss,
+              "bss_over_tss" = bss / tss))
+}
+```
+
+```{r}
+set.seed(1)
+temp <- my_kmeans(iris[,1:4], 3)
+result <- temp$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+
+# Comparison with the built-in function kmeans()
+# The results are identical!
+temp2 <- kmeans(iris[,1:4], 3)
+result2 <- temp2$cluster
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result2 == 1, 1], y = iris[result2 == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result2 == 2, 1], y = iris[result2 == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result2 == 3, 1], y = iris[result2 == 3, 2], color = "Group 3"))
+
+temp
+temp2
+```
+
+```{r}
+set.seed(2)
+result <- my_kmeans(iris[,1:4], 3)$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+```
+
+```{r}
+set.seed(1000)
+result <- my_kmeans(iris[,1:4], 3)$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+```
+
+```{r}
+# If we use the Manhattan Distance
+set.seed(1000)
+result <- my_kmeans(iris[,1:4], 3, Manhattan)$clustering_vector
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+# In this specific scenario, it seems better as a distance measure.
+```
+
+Answers to the conceptual questions  
+1/ The results will be the same, as linear transformation will not change the Euclidean distance. Note that if originally two points are $\mathbf{X}$ and $\mathbf{Y}$ (column vectors), the distance can be measured by $(X-Y)^T(X-Y)$. After the linear projection, the distance becomes $(XV - YV)^T(XV-YV) = (X-Y)^TV^TV(X-Y)$. We have orthogonal unit-length eigenvectors $V^TV = I$, so the clustering result will not change.  
+2/ If $U=XV_k$ where $V_k$ is not a full-rank matrix. We cannot guarantee that the distance measure is consistent with the original data, so the clustering result might be different.  
+3/ No. The solutions will not be the same. Because linear transformation will change the order of L1 distance.
+
+
+```{r}
+# Heirarchical Clustering
+# As discussed in the lab, two/ three/ four clusters might be argued to be optimal when we're using complete linkage
+hc.complete <-hclust(dist(iris[, 1:4]), method="complete")
+plot(hc.complete, main="Complete Linkage ", xlab="", sub="",cex=.9)
+result <- cutree(hc.complete, k = 3)
+# They're almost identical, though there might be some trivial differences due to the instability of kmeans algorithm
+ggplot() + theme_bw() +
+  geom_point(aes(x = iris[result == 1, 1], y = iris[result == 1, 2], color = "Group 1")) +
+  geom_point(aes(x = iris[result == 2, 1], y = iris[result == 2, 2], color = "Group 2")) +
+  geom_point(aes(x = iris[result == 3, 1], y = iris[result == 3, 2], color = "Group 3"))
+
+# Two clusters are most plausible, though we can argue for three or four setting height \in (.5,1)
+hc.single <-hclust(dist(iris[, 1:4]), method="single")
+plot(hc.single, main="Single Linkage ", xlab="", sub="",cex=.9)
+
+# Three clusters are suggested by the average linkage measure.
+hc.average <-hclust(dist(iris[, 1:4]), method="average")
+plot(hc.average, main="Average Linkage ", xlab="", sub="",cex=.9)
+```
+

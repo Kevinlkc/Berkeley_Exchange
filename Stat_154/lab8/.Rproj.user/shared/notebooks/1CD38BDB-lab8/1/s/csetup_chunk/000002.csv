@@ -1,0 +1,8 @@
+"0","library(ggplot2)"
+"0","library(tidyr)"
+"0","library(tidyverse)"
+"0","library(dplyr)"
+"0","library(car)"
+"0","library(ISLR)"
+"0","library(FactoMineR)"
+"2","package 'FactoMineR' was built under R version 3.5.2"

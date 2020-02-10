@@ -1,0 +1,71 @@
+---
+title: "lab 10"
+author: "Kaicheng Luo"
+date: "2019/11/25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(MASS)
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(tree)
+library(ISLR)
+library(gmodels)
+```
+
+```{r}
+High =ifelse(Carseats$Sales<=8, "No", "Yes")
+Carseats =data.frame(Carseats, High)
+```
+
+```{r}
+tree.carseats =tree(High~.-Sales, Carseats)
+summary(tree.carseats)
+```
+
+```{r}
+plot(tree.carseats)
+text(tree.carseats, pretty=0)
+```
+
+```{r}
+# Non-random splitting of dataset
+train <- Carseats[1:320,]
+test <- Carseats[321:400,]
+# Or random splitting of dataset
+Carseats <- Carseats %>% mutate(index = 1:400)
+train <- sample_frac(Carseats %>% select(-Sales), 0.8)
+test <- Carseats %>% select(-Sales) %>% filter(!(index  %in% train$index))
+train <- train %>% select(-index)
+test <- test %>% select(-index)
+# We'll use the latter
+```
+
+```{r}
+# Model Fitting
+model =tree(High~., train)
+summary(model)
+temp <- test %>% select(-High)
+prediction <- predict(model, newdata = temp, type = "class")
+CrossTable(prediction, test$High, chisq = FALSE)
+# The accuracy is 61/80
+```
+
+```{r}
+set.seed(142502)
+cv.tree(model, FUN = prune.misclass)
+# The error is minimized when k = 0.5
+prune_model = prune.misclass(model , best=22)
+plot(prune_model)
+text(prune_model, pretty=0)
+```
+
+```{r}
+new_pred <- predict(prune_model, test %>% select(-High), type = "class")
+CrossTable(new_pred, test$High, chisq = F)
+# The accuracy is still 61/80, though predictions do change.
+```
+

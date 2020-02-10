@@ -1,0 +1,148 @@
+---
+title: "lab2"
+author: "Kaicheng Luo"
+date: "2019/9/16"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(GGally)
+library(FactoMineR)
+```
+
+\section*{Part 1: Exploratory Data Analysis (EDA)}
+```{r, message=FALSE, warning=FALSE}
+# Summary Statistics
+summary(mtcars)
+# Graphs of Distributions
+varNames <- c("mpg", "hp", "qsec", "wt")
+mtcars %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = mpg))
+mtcars %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = hp))
+mtcars %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = qsec))
+mtcars %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = wt))
+# matrix of correlation of all variables
+mtcars <- mtcars %>%
+  select(mpg, hp, qsec,wt)
+cor(mtcars)
+# scatterplot matrix
+ggpairs(mtcars)
+# principal components analysis (of all variables)
+pca_result <- PCA(mtcars)
+# Note that the first two dimensions (Principal Components) collaboratively
+# explains 94.3% of the variation
+pca_result$eig
+```
+
+\section*{Part 2: QR Decomposition}
+```{r}
+qr_ols <- function(X, y){
+  # Adding the column of constant
+  X <- X %>%
+    add_column(rep(1,nrow(X)), .before = TRUE)
+  qr_result <- qr(X)
+  Q <- qr.Q(qr_result)
+  R <- qr.R(qr_result)
+  beta <- backsolve(R, (t(Q) %*% y))
+  return(beta)
+}
+qr_ols(mtcars[,-1], mtcars[,'mpg'])
+```
+
+\section*{Part 3: OLS Outputs}
+```{r}
+My_ols <- function(X, y){
+  result <- list(X = X)
+  coefficients <- qr_ols(X,y)
+  X <- X %>% add_column(rep(1,nrow(X)), .before = TRUE)
+  fitted_values <- as.matrix(X) %*% matrix(coefficients, ncol = 1)
+  residuals <- y - fitted_values
+  RSS <- nrow(X) * var(fitted_values)
+  sigma2 <- RSS / (nrow(X)-1)
+  TSS <- nrow(X) * var(y)
+  ESS <- nrow(X) * var(fitted_values - mean(y))
+  R2 <- ESS/TSS
+  result <- list(y = y, X = X, coefficients = coefficients, fitted_values = fitted_values, residuals = residuals, RSS = RSS, sigma2 = sigma2, TSS = TSS, ESS = ESS, R2 = R2)
+} 
+ols_results <- My_ols(mtcars[,-1], mtcars[,'mpg'])
+```
+
+Here's the display of our results. Note that we can compare our results with the built-in function lm()
+```{r}
+ols_results$coefficients
+# The same coef(s) as summary(lm(mpg ~ hp + qsec + wt, data = mtcars))
+ols_results$fitted_values %>% head()
+ols_results$residuals %>% head()
+ols_results$RSS
+ols_results$sigma2
+ols_results$TSS
+ols_results$ESS
+ols_results$R2
+
+# verification that R2 = cor2(y, yˆ):
+ols_results$R2
+(cor(ols_results$y, ols_results$fitted_values))^2
+```
+
+\section*{Part 4: transformed data}
+1. Mean-Centered Data
+```{r}
+data(mtcars)
+mtcars <- mtcars %>%
+  select(mpg, hp, qsec, carb)
+# result <- lm(mpg ~., data = mtcars)
+mean_hp <- mean(mtcars$hp)
+mean_qsec <- mean(mtcars$qsec)
+mean_carb <- mean(mtcars$carb)
+mean_val <- c(mean_hp, mean_qsec, mean_carb)
+mtcars$hp <- mtcars$hp - mean_hp
+mtcars$qsec <- mtcars$qsec - mean_qsec
+mtcars$carb <- mtcars$carb - mean_carb
+qr_ols(mtcars[,-1], mtcars[,1])
+# Note that except for the intercept, the coef's shall be the same
+# as those calculated by result$coefficients
+```
+
+To recover the intercept term, we simply have to subtract the summation of  $\beta_i\bar{X_i}$
+```{r}
+original_intercept <- qr_ols(mtcars[,-1], mtcars[,1])[1,1]
+for (i in 2:4){
+  original_intercept <- original_intercept - qr_ols(mtcars[,-1], mtcars[,1])[i,1] * mean_val[i-1]
+}
+original_intercept
+```
+
+2. Standardized Data
+```{r}
+data(mtcars)
+mtcars <- mtcars %>%
+  select(mpg, hp, qsec, carb)
+se <- c(sd(mtcars$hp), sd(mtcars$qsec), sd(mtcars$carb))
+mtcars <- mtcars %>%
+  mutate(hp = scale(hp), qsec = scale(qsec), carb = scale(carb))
+qr_ols(mtcars[,-1], mtcars[,1])
+# Note that the coefficent here should be exactly the same as mean-cented data (which is y_bar)
+```
+
+To recover the coefficients, we simply have to divide them by $se(X_i)$
+```{r}
+for (i in 2:4){
+  print(qr_ols(mtcars[,-1], mtcars[,1])[i,1] / se[i-1])
+}
+```
+

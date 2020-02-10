@@ -1,0 +1,6 @@
+"0","# n = 4"
+"0","X2 <- cbind(X,X^2,X^3,X^4)"
+"0","model_2 <- lm(Y~X2)"
+"0","# Store the coefficients"
+"0","Plotdata2 <- cbind(1,X_true, X_true^2, X_true^3, X_true^4)"
+"0","predicted2 <- Plotdata2 %*% model_2$coefficients"

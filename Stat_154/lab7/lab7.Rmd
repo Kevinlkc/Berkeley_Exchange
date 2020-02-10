@@ -1,0 +1,110 @@
+---
+title: "lab7"
+author: "Kaicheng Luo"
+date: "2019/10/21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+```
+
+```{r}
+set.seed(1)
+X <- runif(-2,2,n=100)
+f <- function(x){return(sin(pi*x) +x^2)}
+y <- f(X) + rnorm(length(X), sd=.2)
+plot(X, y)
+```
+
+```{r}
+# A simple implementation of kNN
+kNNR <- function(z,k){
+  return(mean(y[which(rank(abs(X - z))<=k)]))
+}
+# Note that the input is a point and the output is a numerical number
+plotX <- seq(-2,2,0.05)
+plotY <- c()
+for (i in 1:length(plotX)){
+  plotY[i] = kNNR(plotX[i],5)
+}
+plot(plotX, plotY)
+```
+
+```{r}
+Xtest <- runif(-2,2,n=50)
+ytest <- f(Xtest) + rnorm(length(Xtest), sd=.2)
+MSE <- rep(0,100)
+for (k in 1:100){
+  for (i in 1:length(Xtest)){
+    y_hat = kNNR(Xtest[i], k)
+    MSE[k] = MSE[k] + (y_hat - ytest[i])^2
+  }
+}
+plot(1:100, MSE)
+which.min(MSE)
+# The minimum is reached when k = 2
+```
+
+```{r}
+# Comparison to Linear Regression
+X <- runif(-2,2,n=100)
+f <- function(x){ return(.5*x -1)} 
+y <- f(X) + rnorm(length(X), sd=.2)
+Xtest <- runif(-2,2,n=100)
+ytest <- f(Xtest) + rnorm(length(Xtest), sd=.2)
+plot(X, y)
+```
+
+```{r}
+# Fit a linear model and calculate the test MSE
+model <- lm(y~X)$coef
+MSE_lm <- mean((ytest - matrix(c(rep(1,length(Xtest)),Xtest), ncol = 2) %*% model)^2)
+# Fit a kNNR and calculate the test MSE
+MSE_knn <- rep(0,100)
+for (k in 1:100){
+  for (i in 1:length(Xtest)){
+    y_hat = kNNR(Xtest[i], k)
+    MSE_knn[k] = MSE_knn[k] + (y_hat - ytest[i])^2
+  }
+  MSE_knn[k] = MSE_knn[k]/length(Xtest)
+}
+plot(1:100, MSE_knn)
+which.min(MSE_knn)
+# The best choice for k is 9
+min(MSE_knn)
+min(MSE_lm)
+# The knn Model is better, though there's no significant difference between the two.
+```
+
+```{r}
+X <- runif(-2,2,n=100)
+f <- function(x){ return(.5*x^2 + x -2)}
+y <- f(X) + rnorm(length(X), sd=.2)
+Xtest <- runif(-2,2,n=100)
+ytest <- f(Xtest) + rnorm(length(Xtest), sd=.2)
+plot(X, y)
+```
+
+```{r}
+model <- lm(y~X)$coef
+MSE_lm <- mean((ytest - matrix(c(rep(1,length(Xtest)),Xtest), ncol = 2) %*% model)^2)
+# Fit a kNNR and calculate the test MSE
+MSE_knn <- rep(0,100)
+for (k in 1:100){
+  for (i in 1:length(Xtest)){
+    y_hat = kNNR(Xtest[i], k)
+    MSE_knn[k] = MSE_knn[k] + (y_hat - ytest[i])^2
+  }
+  MSE_knn[k] = MSE_knn[k]/length(Xtest)
+}
+plot(1:100, MSE_knn)
+which.min(MSE_knn)
+min(MSE_knn)
+min(MSE_lm)
+# The linear Model is performing a lot worse now when the data is not linearly generated
+```
+

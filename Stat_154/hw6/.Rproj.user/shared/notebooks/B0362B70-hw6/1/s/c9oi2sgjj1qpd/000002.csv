@@ -1,0 +1,8 @@
+"0","# The best model for PCR is that with 3 PCs,"
+"0","BestPCR <- pcr(pH ~ .-fold, data = trainingSet, scale = T)"
+"0","# The best model for PLSR is that with 1 Dimension,"
+"0","BestPLSR <- plsr(pH ~ .-fold, data = trainingSet, scale = T)"
+"0","# The best model for Ridge Regression is that with lambda = 3,"
+"0","BestRR <- glmnet(as.matrix(trainingSet %>% select(-pH)), as.matrix(trainingSet$pH), alpha = 0, lambda = 3)"
+"0","# The best model for Lasso is that with lambda = 0.2,"
+"0","BestLasso <- glmnet(as.matrix(trainingSet %>% select(-pH)), as.matrix(trainingSet$pH), alpha = 1, lambda = 0.2)"

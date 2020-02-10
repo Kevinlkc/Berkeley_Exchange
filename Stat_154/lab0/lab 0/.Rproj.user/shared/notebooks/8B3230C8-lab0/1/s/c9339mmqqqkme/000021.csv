@@ -1,0 +1,4 @@
+"0","temp <- matrix_data %*% t(eff)
+"
+"2","Error in matrix_data %*% t(eff) : 非整合参数
+"

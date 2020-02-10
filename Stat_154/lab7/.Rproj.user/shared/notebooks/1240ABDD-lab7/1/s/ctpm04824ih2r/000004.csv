@@ -1,0 +1,6 @@
+"0","X <- runif(-2,2,n=100)"
+"0","f <- function(x){ return(.5*x^2 + x -2)}"
+"0","y <- f(X) + rnorm(length(X), sd=.2)"
+"0","Xtest <- runif(-2,2,n=100)"
+"0","ytest <- f(Xtest) + rnorm(length(Xtest), sd=.2)"
+"0","plot(X, y)"

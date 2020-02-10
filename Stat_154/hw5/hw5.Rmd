@@ -1,0 +1,257 @@
+---
+title: "hw5"
+author: "Kaicheng Luo"
+date: "2019/10/9"
+output:
+  pdf_document:
+    keep_tex: yes  
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+```
+
+```{r}
+set.seed(10000)
+# Data Processing
+day <- read.csv("day.csv")
+hour <- read.csv("hour.csv")
+data_day <- subset(day, yr == 0)
+data_day <- data_day %>%
+  mutate(clearday = ifelse(weathersit == 1, 1, 0))
+data_day <- data_day %>%
+  mutate(temp = (temp-min(temp))/(max(temp)-min(temp)))
+```
+
+```{r, warning=FALSE}
+# Fitting Models
+model_1 <- lm(registered ~ temp, data = data_day)
+model_2 <- lm(registered ~ temp + I(temp^2), data = data_day)
+model_3 <- lm(registered ~ temp + I(temp^2) + workingday, data = data_day)
+model_4 <- lm(registered ~ temp + I(temp^2) + workingday + clearday, data = data_day)
+model_5 <- lm(registered ~ temp + I(temp^2) + workingday + clearday + temp*workingday, data = data_day)
+# stargazer(model_1, model_2, model_3, model_4, model_5, type = 'latex')
+```
+
+```{r}
+# Basic Model Comparison
+MSE <- rep(0,5)
+MSE[1] = mean(model_1$residuals^2)
+MSE[2] = mean(model_2$residuals^2)
+MSE[3] = mean(model_3$residuals^2)
+MSE[4] = mean(model_4$residuals^2)
+MSE[5] = mean(model_5$residuals^2)
+MSE %>% data.frame("Complexity" = 1:5, MSE = MSE) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = Complexity, y = MSE), color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model w.r.t # of Regressors",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+
+```{r}
+# Hold-out Method
+subs <- sample(365, 292)
+# Subtracting Training and Test Set
+trainingSet <- data_day[subs, ]
+testSet <- data_day[-subs, ]
+# Train the Model
+model_1 <- lm(registered ~ temp, data = trainingSet)
+model_2 <- lm(registered ~ temp + I(temp^2), data = trainingSet)
+model_3 <- lm(registered ~ temp + I(temp^2) + workingday, data = trainingSet)
+model_4 <- lm(registered ~ temp + I(temp^2) + workingday + clearday, data = trainingSet)
+model_5 <- lm(registered ~ temp + I(temp^2) + workingday + clearday + temp*workingday, data = trainingSet)
+# Compute the training MSE
+MSE <- rep(0,5)
+MSE[1] = mean(model_1$residuals^2)
+MSE[2] = mean(model_2$residuals^2)
+MSE[3] = mean(model_3$residuals^2)
+MSE[4] = mean(model_4$residuals^2)
+MSE[5] = mean(model_5$residuals^2)
+# Compute the test MSE
+test_MSE = rep(0,5)
+testX = cbind(1, testSet$temp)
+test_MSE[1] = mean((testSet[, "registered"] - testX %*% model_1$coefficients)^2)
+testX = cbind(1, testSet$temp, testSet$temp^2)
+test_MSE[2] = mean((testSet[, "registered"] - testX %*% model_2$coefficients)^2)
+testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday)
+test_MSE[3] = mean((testSet[, "registered"] - testX %*% model_3$coefficients)^2)
+testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday)
+test_MSE[4] = mean((testSet[, "registered"] - testX %*% model_4$coefficients)^2)
+testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday, testSet$temp * testSet$workingday)
+test_MSE[5] = mean((testSet[, "registered"] - testX %*% model_5$coefficients)^2)
+```
+
+```{r}
+data.frame("Complexity" = 1:5, training_MSE = MSE, test_MSE = test_MSE) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = Complexity, y = training_MSE), color = 'maroon', size = 1) +
+  geom_line(aes(x = Complexity, y = test_MSE), color = 'purple', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model w.r.t # of Regressors",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+
+\section*{Problem 5 Bike Sharing: Cross-validation}
+```{r}
+# Create 10 folds
+fold <- list()
+tempdata <- data_day
+i = 1
+data_day <- data_day %>%
+  mutate(fold = 0)
+while (nrow(tempdata)>5){
+  fold[[i]] <-   sample_n(tempdata, 36)
+  tempdata <- tempdata %>%
+    filter(!(instant %in% fold[[i]]$instant))
+  i = i+1
+}
+for (i in 1:nrow(data_day)){
+  for (j in 1:10){
+    if (data_day$instant[i] %in% fold[[j]]$instant){
+      data_day$fold[i] = j
+    }
+  }
+}
+```
+
+```{r}
+MSE <- matrix(0, nrow = 5, ncol = 10)
+for (i in 1:10){
+  trainingSet = data_day %>% filter(fold != i)
+  testSet = data_day %>% filter(fold == i)
+  model_1 <- lm(registered ~ temp, data = trainingSet)
+  model_2 <- lm(registered ~ temp + I(temp^2), data = trainingSet)
+  model_3 <- lm(registered ~ temp + I(temp^2) + workingday, data = trainingSet)
+  model_4 <- lm(registered ~ temp + I(temp^2) + workingday + clearday, data = trainingSet)
+  model_5 <- lm(registered ~ temp + I(temp^2) + workingday + clearday + temp*workingday, data = trainingSet)
+  testX = cbind(1, testSet$temp)
+  MSE[1, i] = mean((testSet[, "registered"] - testX %*% model_1$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2)
+  MSE[2, i] = mean((testSet[, "registered"] - testX %*% model_2$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday)
+  MSE[3, i] = mean((testSet[, "registered"] - testX %*% model_3$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday)
+  MSE[4, i] = mean((testSet[, "registered"] - testX %*% model_4$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday, testSet$temp * testSet$workingday)
+  MSE[5, i] = mean((testSet[, "registered"] - testX %*% model_5$coefficients)^2)
+}
+MSE
+MSE_bar <- c()
+for (i in 1:5){
+  print(mean(MSE[i, ]))
+  MSE_bar <- c(MSE_bar, mean(MSE[i, ]))
+}
+```
+
+```{r}
+data.frame("Complexity" = 1:5, "kfold_MSE" = MSE_bar) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = Complexity, y = kfold_MSE), color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model w.r.t # of Regressors",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+
+\section*{Problem 6 BootStrap MSE}
+```{r}
+MSE <- matrix(0, nrow = 5, ncol = 200)
+for (i in 1:200){
+  trainingSet <- data_day[sample(365, 200, replace = TRUE), ]
+  testSet <- data_day %>%
+    filter(! instant %in% trainingSet$instant)
+  model_1 <- lm(registered ~ temp, data = trainingSet)
+  model_2 <- lm(registered ~ temp + I(temp^2), data = trainingSet)
+  model_3 <- lm(registered ~ temp + I(temp^2) + workingday, data = trainingSet)
+  model_4 <- lm(registered ~ temp + I(temp^2) + workingday + clearday, data = trainingSet)
+  model_5 <- lm(registered ~ temp + I(temp^2) + workingday + clearday + temp*workingday, data = trainingSet)
+  testX = cbind(1, testSet$temp)
+  MSE[1, i] = mean((testSet[, "registered"] - testX %*% model_1$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2)
+  MSE[2, i] = mean((testSet[, "registered"] - testX %*% model_2$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday)
+  MSE[3, i] = mean((testSet[, "registered"] - testX %*% model_3$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday)
+  MSE[4, i] = mean((testSet[, "registered"] - testX %*% model_4$coefficients)^2)
+  testX = cbind(1, testSet$temp, testSet$temp^2, testSet$workingday, testSet$clearday, testSet$temp * testSet$workingday)
+  MSE[5, i] = mean((testSet[, "registered"] - testX %*% model_5$coefficients)^2)
+}
+MSE_bar <- c()
+for (i in 1:5){
+  print(mean(MSE[i, ]))
+  MSE_bar <- c(MSE_bar, mean(MSE[i, ]))
+}
+MSE_bar
+```
+
+```{r}
+data.frame("Complexity" = 1:5, "Bootstrap_MSE" = MSE_bar) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = Complexity, y = Bootstrap_MSE), color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model w.r.t # of Regressors",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+
+```{r}
+MSE_var <- c()
+for (i in 1:5){
+  print(sd(MSE[i, ]))
+  MSE_var <- c(MSE_var, sd(MSE[i, ]))
+}
+data.frame("Complexity" = 1:5, "sd_MSE" = MSE_var) %>%
+  ggplot() + theme_bw() +
+  geom_line(aes(x = Complexity, y = sd_MSE), color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model w.r.t # of Regressors",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+
+```{r}
+data.frame("Complexity" = 1:5, "MSE" = MSE[1,]) %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = MSE),color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model 1",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+data.frame("Complexity" = 1:5, "MSE" = MSE[2,]) %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = MSE),color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model 2",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+data.frame("Complexity" = 1:5, "MSE" = MSE[3,]) %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = MSE),color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model 3",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+data.frame("Complexity" = 1:5, "MSE" = MSE[4,]) %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = MSE), color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model 4",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+data.frame("Complexity" = 1:5, "MSE" = MSE[5,]) %>%
+  ggplot() + theme_bw() +
+  geom_histogram(aes(x = MSE),color = 'maroon', size = 1) +
+  labs(
+    title = "MSE of the Bike Sharing Model 5",
+    caption = "Dataset: 2011 Washington Bike Sharing Data (Hadi Fanaee)"
+  )
+```
+

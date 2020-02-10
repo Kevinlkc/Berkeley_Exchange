@@ -1,0 +1,5 @@
+"0","set.seed(1)"
+"0","X <- runif(-2,2,n=100)"
+"0","f <- function(x){return(sin(pi*x) +x^2)}"
+"0","y <- f(X) + rnorm(length(X), sd=.2)"
+"0","plot(X, y)"

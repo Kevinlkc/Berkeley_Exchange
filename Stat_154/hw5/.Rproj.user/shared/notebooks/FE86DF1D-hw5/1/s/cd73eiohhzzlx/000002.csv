@@ -1,0 +1,8 @@
+"0","# Data Processing"
+"0","day <- read.csv(""day.csv"")"
+"0","hour <- read.csv(""hour.csv"")"
+"0","data_day <- subset(day, yr == 0)"
+"0","data_day <- data_day %>%"
+"0","  mutate(clearday = ifelse(weathersit == 1, 1, 0))"
+"0","data_day <- data_day %>%"
+"0","  mutate(temp = (temp-min(temp))/(max(temp)-min(temp)))"

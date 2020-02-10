@@ -1,0 +1,4 @@
+"0","ridge.pred = predict(ridge.mod,s=0,newx=x[test,], newy = y[test], exact = T)
+"
+"2","错误: used coef.glmnet() or predict.glmnet() with `exact=TRUE` so must in addition supply original argument(s)  x and y  in order to safely rerun glmnet
+"
